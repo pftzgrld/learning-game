@@ -1,6 +1,6 @@
 {
-  "name": "FIO - Figure it Out",
-  "short_name": "FIO",
+  "name": "Learning Game",
+  "short_name": "Learning Game",
   "description": "Spelling & Maths learning game for Elsie and Freya",
   "start_url": "./",
   "display": "standalone",
