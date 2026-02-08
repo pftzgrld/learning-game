@@ -117,12 +117,27 @@
   .player-tag.elsie .avatar-sm { background: linear-gradient(135deg, var(--pink), var(--purple)); }
   .player-tag.freya .avatar-sm { background: linear-gradient(135deg, var(--blue), var(--green)); }
 
-  .back-btn {
-    background: none; border: none; color: #a5b4fc;
-    font-size: 0.9rem; cursor: pointer; padding: 8px 12px;
-    border-radius: 8px; transition: all 0.2s;
+  .nav-pill {
+    background: rgba(165,180,252,0.15);
+    border: 1px solid rgba(165,180,252,0.3);
+    color: #a5b4fc;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    white-space: nowrap;
   }
-  .back-btn:hover { background: rgba(165,180,252,0.1); }
+  .nav-pill:hover { background: rgba(165,180,252,0.25); }
+
+  .screen-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+  }
 
   .mode-tag {
     display: inline-block;
@@ -307,36 +322,56 @@
     body { padding: 12px; padding-top: env(safe-area-inset-top, 12px); }
     h1 { font-size: 1.8rem; }
     .subtitle { font-size: 1rem; margin-bottom: 24px; }
-    .profiles, .modes { gap: 14px; }
-    .profile-btn, .mode-btn { padding: 20px 24px; min-width: 140px; flex: 1; }
-    .profile-avatar, .mode-icon { width: 64px; height: 64px; font-size: 2rem; }
-    .profile-name, .mode-name { font-size: 1.2rem; }
-    .game-header { margin-bottom: 16px; }
-    .game-card { padding: 24px 16px; }
-    .game-input { font-size: 16px; max-width: 100%; padding: 16px; }
+    .profiles, .modes { flex-direction: column; align-items: stretch; gap: 12px; }
+    .profile-btn, .mode-btn {
+      flex-direction: row; gap: 16px; text-align: left;
+      padding: 20px 24px; min-width: unset; flex: unset;
+    }
+    .profile-avatar, .mode-icon { width: 56px; height: 56px; font-size: 1.8rem; flex-shrink: 0; }
+    .profile-name, .mode-name { font-size: 1.3rem; }
+    .profile-info, .mode-info { font-size: 0.9rem; }
+    .screen-header { margin-bottom: 12px; }
+    .nav-pill { font-size: 0.8rem; padding: 8px 14px; min-height: 40px; }
+    .game-header { margin-bottom: 12px; }
+    .game-card { padding: 20px 16px; }
+    .game-input { font-size: 16px; max-width: 100%; padding: 14px; }
     .question-text { font-size: 1.5rem; }
-    .hint-text { font-size: 1rem; margin-bottom: 20px; min-height: 40px; }
-    .stats-row { gap: 16px; margin-bottom: 20px; }
+    .hint-text { font-size: 1rem; margin-bottom: 16px; min-height: 36px; }
+    .stats-row { gap: 16px; margin-bottom: 16px; }
     .stat-val { font-size: 1.3rem; }
-    .level-badge { font-size: 0.9rem; padding: 5px 16px; margin-bottom: 16px; }
-    .btn { padding: 16px 28px; font-size: 1rem; min-height: 48px; }
+    .level-badge { font-size: 0.9rem; padding: 5px 16px; margin-bottom: 12px; }
+    .btn { padding: 14px 28px; font-size: 1rem; min-height: 48px; }
     .btn-hear { width: 48px; height: 48px; min-height: 48px; font-size: 1.2rem; padding: 12px; }
     .input-row { gap: 8px; }
-    .action-row { margin-top: 16px; }
+    .action-row { margin-top: 12px; }
     .feedback { font-size: 1.1rem; }
     .correct-answer { font-size: 1.3rem; }
-    .back-btn { padding: 10px 14px; font-size: 0.85rem; min-height: 44px; }
     .player-tag { padding: 6px 12px; }
     .player-tag .avatar-sm { width: 28px; height: 28px; font-size: 0.9rem; }
   }
 
   @media (max-width: 360px) {
     h1 { font-size: 1.5rem; }
-    .profile-btn, .mode-btn { padding: 16px 18px; min-width: 120px; }
-    .profile-avatar, .mode-icon { width: 52px; height: 52px; font-size: 1.7rem; }
-    .game-card { padding: 20px 12px; }
+    .profile-btn, .mode-btn { padding: 16px 18px; }
+    .profile-avatar, .mode-icon { width: 48px; height: 48px; font-size: 1.5rem; }
+    .game-card { padding: 16px 12px; }
     .question-text { font-size: 1.3rem; }
   }
+
+  /* Compact layout when mobile keyboard is open */
+  .keyboard-open .game-header { margin-bottom: 6px; }
+  .keyboard-open .mode-tag { display: none; }
+  .keyboard-open .level-badge { margin-bottom: 6px; padding: 3px 12px; font-size: 0.75rem; }
+  .keyboard-open .stats-row { margin-bottom: 6px; gap: 12px; }
+  .keyboard-open .stat-val { font-size: 1rem; }
+  .keyboard-open .stat-label { font-size: 0.6rem; }
+  .keyboard-open .game-card { padding: 14px 12px; }
+  .keyboard-open .hint-text { font-size: 0.85rem; margin-bottom: 10px; min-height: unset; }
+  .keyboard-open .question-text { font-size: 1.2rem; min-height: unset; margin-bottom: 4px; }
+  .keyboard-open .feedback { min-height: unset; margin-top: 6px; font-size: 0.95rem; }
+  .keyboard-open .correct-answer { font-size: 1.1rem; margin-top: 4px; }
+  .keyboard-open .action-row { margin-top: 8px; }
+  .keyboard-open .btn { padding: 12px 24px; font-size: 0.95rem; min-height: 42px; }
 </style>
 </head>
 <body>
@@ -361,6 +396,9 @@
 
 <!-- ===== SCREEN 2: MODE SELECT ===== -->
 <div class="screen" id="screen-mode">
+  <div class="screen-header">
+    <button class="nav-pill" onclick="goHome()">&#8592; Switch player</button>
+  </div>
   <h1 id="mode-title">What shall we practise?</h1>
   <p class="subtitle" id="mode-subtitle"></p>
   <div class="modes">
@@ -375,7 +413,6 @@
       <div class="mode-info" id="maths-level-info"></div>
     </button>
   </div>
-  <button class="back-btn" style="margin-top:30px" onclick="goHome()">&#8592; Switch player</button>
 </div>
 
 <!-- ===== SCREEN 3: GAME ===== -->
@@ -385,7 +422,7 @@
       <div class="avatar-sm"></div>
       <span id="player-name-tag"></span>
     </div>
-    <button class="back-btn" onclick="goModeSelect()">&#8592; Change subject</button>
+    <button class="nav-pill" onclick="goModeSelect()">&#8592; Change subject</button>
   </div>
 
   <div class="mode-tag" id="mode-tag-label"></div>
@@ -753,7 +790,7 @@ function startGame(mode) {
   } else {
     input.className = 'game-input';
     input.placeholder = 'Type your answer...';
-    input.inputMode = 'text';
+    input.inputMode = 'decimal';
     document.getElementById('btn-hear').style.display = 'none';
   }
 
@@ -986,6 +1023,14 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
+
+// ===== KEYBOARD DETECTION (mobile) =====
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const isKeyboard = window.visualViewport.height < window.innerHeight * 0.75;
+    document.body.classList.toggle('keyboard-open', isKeyboard);
+  });
+}
 
 // Load voices
 window.speechSynthesis.onvoiceschanged = () => {};
