@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FIO">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1e1b4b">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e1b4b'/><text y='68' x='50' text-anchor='middle' font-size='50'>🎓</text></svg>">
+<title>FIO - Figure it Out</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --pink: #ff6b9d;
+    --purple: #c084fc;
+    --blue: #60a5fa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --orange: #fb923c;
+    --bg: #1e1b4b;
+    --card: #312e81;
+    --text: #f8fafc;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 20px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px);
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .screen { display: none; width: 100%; max-width: 600px; text-align: center; }
+  .screen.active { display: block; }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle { color: #a5b4fc; font-size: 1.1rem; margin-bottom: 40px; }
+
+  .profiles, .modes { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+
+  .profile-btn, .mode-btn {
+    background: var(--card);
+    border: 3px solid transparent;
+    border-radius: 20px;
+    padding: 30px 40px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    min-width: 180px;
+    color: var(--text);
+  }
+
+  .profile-btn:hover, .mode-btn:hover { border-color: var(--purple); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(192,132,252,0.3); }
+
+  .profile-avatar, .mode-icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem;
+  }
+
+  .profile-btn:first-child .profile-avatar { background: linear-gradient(135deg, var(--pink), var(--purple)); }
+  .profile-btn:last-child .profile-avatar { background: linear-gradient(135deg, var(--blue), var(--green)); }
+
+  .mode-btn:first-child .mode-icon { background: linear-gradient(135deg, var(--yellow), var(--orange)); }
+  .mode-btn:last-child .mode-icon { background: linear-gradient(135deg, var(--green), var(--blue)); }
+
+  .profile-name, .mode-name { font-size: 1.4rem; font-weight: 700; }
+  .profile-info, .mode-info { font-size: 0.85rem; color: #a5b4fc; }
+
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 4px;
+  }
+
+  .player-tag {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card);
+    padding: 8px 16px;
+    border-radius: 30px;
+  }
+
+  .player-tag .avatar-sm {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .player-tag.elsie .avatar-sm { background: linear-gradient(135deg, var(--pink), var(--purple)); }
+  .player-tag.freya .avatar-sm { background: linear-gradient(135deg, var(--blue), var(--green)); }
+
+  .back-btn {
+    background: none; border: none; color: #a5b4fc;
+    font-size: 0.9rem; cursor: pointer; padding: 8px 12px;
+    border-radius: 8px; transition: all 0.2s;
+  }
+  .back-btn:hover { background: rgba(165,180,252,0.1); }
+
+  .mode-tag {
+    display: inline-block;
+    background: rgba(165,180,252,0.15);
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: #a5b4fc;
+    margin-bottom: 8px;
+  }
+
+  .level-badge {
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .stats-row {
+    display: flex; justify-content: center; gap: 24px;
+    margin-bottom: 30px; flex-wrap: wrap;
+  }
+
+  .stat { text-align: center; }
+  .stat-val { font-size: 1.6rem; font-weight: 700; }
+  .stat-label { font-size: 0.75rem; color: #a5b4fc; text-transform: uppercase; letter-spacing: 1px; }
+
+  .game-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 40px 30px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hint-text {
+    font-size: 1.15rem;
+    color: #c7d2fe;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    min-height: 56px;
+  }
+
+  .question-text {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    min-height: 48px;
+    letter-spacing: 1px;
+  }
+
+  .hint-text em { color: var(--yellow); font-style: normal; font-weight: 600; }
+
+  .input-row { display: flex; gap: 12px; justify-content: center; align-items: center; }
+
+  .game-input {
+    font-size: 1.5rem;
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: 3px solid #4338ca;
+    background: #1e1b4b;
+    color: var(--text);
+    text-align: center;
+    width: 100%;
+    max-width: 340px;
+    outline: none;
+    transition: border-color 0.3s;
+    font-family: inherit;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .game-input.spelling-input { letter-spacing: 2px; }
+  .game-input:focus { border-color: var(--purple); }
+  .game-input.correct { border-color: var(--green); background: rgba(52,211,153,0.1); }
+  .game-input.wrong { border-color: var(--pink); background: rgba(255,107,157,0.1); }
+
+  .btn {
+    padding: 14px 32px;
+    border-radius: 16px;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    color: white;
+    box-shadow: 0 4px 15px rgba(96,165,250,0.3);
+  }
+
+  .btn-hear {
+    background: var(--card);
+    border: 2px solid #4338ca;
+    color: var(--text);
+    padding: 14px 20px;
+    font-size: 1.3rem;
+    border-radius: 50%;
+    width: 56px; height: 56px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .btn-hear:hover { border-color: var(--purple); }
+
+  .action-row {
+    display: flex; gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .feedback {
+    margin-top: 20px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    min-height: 40px;
+    transition: all 0.3s;
+  }
+
+  .feedback.correct-fb { color: var(--green); }
+  .feedback.wrong-fb { color: var(--pink); }
+
+  .correct-answer {
+    margin-top: 10px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--yellow);
+  }
+
+  .level-change {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+    background: rgba(30,27,75,0.92);
+    z-index: 100;
+    animation: fadeInOut 2s forwards;
+    pointer-events: none;
+  }
+
+  .level-change .emoji { font-size: 4rem; }
+  .level-change .msg { font-size: 1.8rem; font-weight: 700; }
+  .level-change.up .msg { color: var(--green); }
+  .level-change.down .msg { color: var(--orange); }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    75% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    z-index: 90;
+    animation: confettiFall 1.5s forwards;
+    pointer-events: none;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .streak-fire { display: inline; }
+
+  @media (max-width: 500px) {
+    body { padding: 12px; padding-top: env(safe-area-inset-top, 12px); }
+    h1 { font-size: 1.8rem; }
+    .subtitle { font-size: 1rem; margin-bottom: 24px; }
+    .profiles, .modes { gap: 14px; }
+    .profile-btn, .mode-btn { padding: 20px 24px; min-width: 140px; flex: 1; }
+    .profile-avatar, .mode-icon { width: 64px; height: 64px; font-size: 2rem; }
+    .profile-name, .mode-name { font-size: 1.2rem; }
+    .game-header { margin-bottom: 16px; }
+    .game-card { padding: 24px 16px; }
+    .game-input { font-size: 16px; max-width: 100%; padding: 16px; }
+    .question-text { font-size: 1.5rem; }
+    .hint-text { font-size: 1rem; margin-bottom: 20px; min-height: 40px; }
+    .stats-row { gap: 16px; margin-bottom: 20px; }
+    .stat-val { font-size: 1.3rem; }
+    .level-badge { font-size: 0.9rem; padding: 5px 16px; margin-bottom: 16px; }
+    .btn { padding: 16px 28px; font-size: 1rem; min-height: 48px; }
+    .btn-hear { width: 48px; height: 48px; min-height: 48px; font-size: 1.2rem; padding: 12px; }
+    .input-row { gap: 8px; }
+    .action-row { margin-top: 16px; }
+    .feedback { font-size: 1.1rem; }
+    .correct-answer { font-size: 1.3rem; }
+    .back-btn { padding: 10px 14px; font-size: 0.85rem; min-height: 44px; }
+    .player-tag { padding: 6px 12px; }
+    .player-tag .avatar-sm { width: 28px; height: 28px; font-size: 0.9rem; }
+  }
+
+  @media (max-width: 360px) {
+    h1 { font-size: 1.5rem; }
+    .profile-btn, .mode-btn { padding: 16px 18px; min-width: 120px; }
+    .profile-avatar, .mode-icon { width: 52px; height: 52px; font-size: 1.7rem; }
+    .game-card { padding: 20px 12px; }
+    .question-text { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== SCREEN 1: PROFILE SELECT ===== -->
+<div class="screen active" id="screen-select">
+  <h1>Learning Adventure</h1>
+  <p class="subtitle">Who's playing?</p>
+  <div class="profiles">
+    <button class="profile-btn" onclick="selectPlayer('elsie')">
+      <div class="profile-avatar">👑</div>
+      <div class="profile-name">Elsie</div>
+      <div class="profile-info" id="elsie-info">4th Class</div>
+    </button>
+    <button class="profile-btn" onclick="selectPlayer('freya')">
+      <div class="profile-avatar">🐱</div>
+      <div class="profile-name">Freya</div>
+      <div class="profile-info" id="freya-info">2nd Class</div>
+    </button>
+  </div>
+</div>
+
+<!-- ===== SCREEN 2: MODE SELECT ===== -->
+<div class="screen" id="screen-mode">
+  <h1 id="mode-title">What shall we practise?</h1>
+  <p class="subtitle" id="mode-subtitle"></p>
+  <div class="modes">
+    <button class="mode-btn" onclick="startGame('spelling')">
+      <div class="mode-icon">📝</div>
+      <div class="mode-name">Spelling</div>
+      <div class="mode-info" id="spelling-level-info"></div>
+    </button>
+    <button class="mode-btn" onclick="startGame('maths')">
+      <div class="mode-icon">🔢</div>
+      <div class="mode-name">Maths</div>
+      <div class="mode-info" id="maths-level-info"></div>
+    </button>
+  </div>
+  <button class="back-btn" style="margin-top:30px" onclick="goHome()">&#8592; Switch player</button>
+</div>
+
+<!-- ===== SCREEN 3: GAME ===== -->
+<div class="screen" id="screen-game">
+  <div class="game-header">
+    <div class="player-tag" id="player-tag">
+      <div class="avatar-sm"></div>
+      <span id="player-name-tag"></span>
+    </div>
+    <button class="back-btn" onclick="goModeSelect()">&#8592; Change subject</button>
+  </div>
+
+  <div class="mode-tag" id="mode-tag-label"></div>
+  <div class="level-badge" id="level-badge"></div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-val" id="stat-score">0</div>
+      <div class="stat-label">Score</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="stat-streak">0</div>
+      <div class="stat-label">Streak</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="stat-best">0</div>
+      <div class="stat-label">Best Streak</div>
+    </div>
+  </div>
+
+  <div class="game-card">
+    <!-- Maths: question displayed large -->
+    <div class="question-text" id="question-text" style="display:none"></div>
+    <!-- Both: hint/sentence -->
+    <div class="hint-text" id="hint-text"></div>
+    <div class="input-row">
+      <button class="btn btn-hear" id="btn-hear" onclick="hearWord()" title="Hear the word again">&#128264;</button>
+      <input type="text" id="game-input" class="game-input" placeholder="Type your answer..." autocomplete="off" autocapitalize="none" spellcheck="false">
+    </div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="btn-check" onclick="checkAnswer()">Check &#10003;</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="correct-answer" id="correct-answer"></div>
+  </div>
+</div>
+
+<script>
+// ===== SPELLING WORD BANK =====
+const WORDS = {
+  1: [
+    { word: "friend", hint: "Someone you like to play with is called a ___." },
+    { word: "because", hint: "I was late ___ the bus didn't come." },
+    { word: "school", hint: "You go here every morning to learn new things." },
+    { word: "family", hint: "Your mum, dad, brothers and sisters are your ___." },
+    { word: "thought", hint: "She ___ about what to have for dinner." },
+    { word: "people", hint: "There were lots of ___ at the park today." },
+    { word: "money", hint: "You use ___ to buy things in a shop." },
+    { word: "answer", hint: "Put up your hand if you know the ___." },
+    { word: "every", hint: "She eats breakfast ___ morning." },
+    { word: "would", hint: "I ___ love to go swimming today." },
+    { word: "could", hint: "She ___ run faster than anyone in her class." },
+    { word: "should", hint: "You ___ always say please and thank you." },
+    { word: "their", hint: "___ dog is so cute and fluffy." },
+    { word: "again", hint: "Can we play that game ___?" },
+    { word: "little", hint: "The ___ kitten was so tiny." },
+    { word: "house", hint: "We live in a ___ with a red door." },
+    { word: "water", hint: "I'm thirsty, can I have some ___?" },
+    { word: "where", hint: "___ did you put my schoolbag?" },
+    { word: "which", hint: "___ flavour of ice cream do you want?" },
+    { word: "after", hint: "We can go to the playground ___ lunch." },
+    { word: "right", hint: "Turn ___ at the corner to get to the shop." },
+    { word: "laugh", hint: "That joke made everyone ___." },
+    { word: "enough", hint: "Have you had ___ to eat?" },
+    { word: "caught", hint: "She ___ the ball with one hand." },
+    { word: "young", hint: "The ___ puppy was only six weeks old." }
+  ],
+  2: [
+    { word: "beautiful", hint: "The sunset was absolutely ___." },
+    { word: "different", hint: "Each snowflake is ___ from all the others." },
+    { word: "special", hint: "Your birthday is a very ___ day." },
+    { word: "through", hint: "The rabbit ran ___ the hole in the fence." },
+    { word: "important", hint: "It's ___ to brush your teeth every night." },
+    { word: "believe", hint: "Do you ___ in magic?" },
+    { word: "together", hint: "Let's build this Lego set ___." },
+    { word: "surprise", hint: "We planned a ___ party for Mum." },
+    { word: "favourite", hint: "What's your ___ colour?" },
+    { word: "horrible", hint: "The medicine tasted ___." },
+    { word: "imagine", hint: "Close your eyes and ___ you're on a beach." },
+    { word: "promise", hint: "I ___ I'll be home before dark." },
+    { word: "trouble", hint: "The naughty cat got into ___ again." },
+    { word: "between", hint: "The ball landed ___ the two trees." },
+    { word: "although", hint: "___ it was cold, they still went swimming." },
+    { word: "machine", hint: "The washing ___ is very loud." },
+    { word: "certain", hint: "Are you ___ that's the right answer?" },
+    { word: "strange", hint: "There was a ___ noise coming from the attic." },
+    { word: "usually", hint: "I ___ walk to school but today Dad drove me." },
+    { word: "question", hint: "The teacher asked a really hard ___." },
+    { word: "captain", hint: "She was chosen as ___ of the football team." },
+    { word: "perhaps", hint: "___ we could go to the cinema later?" },
+    { word: "minutes", hint: "The cake needs twenty ___ in the oven." },
+    { word: "journey", hint: "The ___ to Grandma's house takes two hours." },
+    { word: "towards", hint: "The dog ran ___ the gate when it heard the car." }
+  ],
+  3: [
+    { word: "knowledge", hint: "Reading books helps you gain ___." },
+    { word: "separate", hint: "Please ___ the coloured sweets into piles." },
+    { word: "calendar", hint: "Check the ___ to see what day the party is on." },
+    { word: "February", hint: "The shortest month of the year is ___." },
+    { word: "library", hint: "You can borrow books from the ___." },
+    { word: "restaurant", hint: "We went to an Italian ___ for dinner." },
+    { word: "favourite", hint: "Chocolate is my ___ flavour." },
+    { word: "environment", hint: "We should look after the ___ by recycling." },
+    { word: "disappear", hint: "The magician made the rabbit ___." },
+    { word: "experiment", hint: "In science class we did an ___ with magnets." },
+    { word: "interested", hint: "She was very ___ in the story about space." },
+    { word: "jewellery", hint: "Mum keeps her ___ in a special box." },
+    { word: "language", hint: "Irish is a ___ spoken in Ireland." },
+    { word: "medicine", hint: "The doctor gave her ___ for her cough." },
+    { word: "recommend", hint: "I ___ this book — it's brilliant." },
+    { word: "strength", hint: "It takes a lot of ___ to lift that heavy box." },
+    { word: "vegetable", hint: "A carrot is a ___ that grows underground." },
+    { word: "adventure", hint: "The explorers went on an amazing ___." },
+    { word: "character", hint: "My favourite ___ in the book is the wizard." },
+    { word: "equipment", hint: "The football team got brand new ___." },
+    { word: "meanwhile", hint: "___, back at the castle, the dragon was sleeping." },
+    { word: "paragraph", hint: "Start a new ___ when you change topic." },
+    { word: "attention", hint: "Pay ___ to what the teacher is saying." },
+    { word: "dangerous", hint: "Swimming in the deep river is very ___." },
+    { word: "according", hint: "___ to the weather forecast, it will rain tomorrow." }
+  ],
+  4: [
+    { word: "accommodate", hint: "The hotel can ___ up to 200 guests." },
+    { word: "embarrass", hint: "Please don't ___ me in front of my friends." },
+    { word: "privilege", hint: "It's a ___ to be chosen for the school team." },
+    { word: "necessary", hint: "Is it really ___ to bring an umbrella today?" },
+    { word: "occurrence", hint: "Snow in April is a rare ___." },
+    { word: "conscience", hint: "Her ___ told her to return the lost wallet." },
+    { word: "temperature", hint: "The ___ dropped below zero last night." },
+    { word: "government", hint: "The ___ makes laws for the country." },
+    { word: "definitely", hint: "I will ___ be there on time." },
+    { word: "immediately", hint: "Come here ___ — don't wait!" },
+    { word: "appreciate", hint: "I really ___ your help with my homework." },
+    { word: "competition", hint: "She entered a swimming ___ and won a medal." },
+    { word: "dictionary", hint: "Look up the word in the ___ if you don't know it." },
+    { word: "explanation", hint: "Can you give me an ___ for why you were late?" },
+    { word: "imagination", hint: "Use your ___ to write a story about dragons." },
+    { word: "opportunity", hint: "This is a great ___ to learn something new." },
+    { word: "particularly", hint: "She was ___ good at maths and science." },
+    { word: "recognise", hint: "I didn't ___ her with her new haircut." },
+    { word: "secretary", hint: "The school ___ answered the phone." },
+    { word: "communicate", hint: "It's important to ___ clearly with your team." },
+    { word: "exaggerate", hint: "Don't ___ — it wasn't THAT scary!" },
+    { word: "individual", hint: "Every ___ person has different fingerprints." },
+    { word: "possession", hint: "His most treasured ___ was his grandfather's watch." },
+    { word: "restaurant", hint: "The new ___ on Main Street serves amazing pasta." },
+    { word: "sufficient", hint: "Do we have ___ food for everyone at the party?" }
+  ],
+  5: [
+    { word: "phenomenon", hint: "The Northern Lights are a natural ___." },
+    { word: "miscellaneous", hint: "She had a drawer full of ___ bits and pieces." },
+    { word: "onomatopoeia", hint: "Words like 'buzz' and 'splash' are examples of ___." },
+    { word: "surveillance", hint: "The shop had ___ cameras to prevent stealing." },
+    { word: "independent", hint: "She's very ___ and likes doing things herself." },
+    { word: "mischievous", hint: "The ___ monkey stole the tourist's hat." },
+    { word: "guarantee", hint: "The new TV comes with a two-year ___." },
+    { word: "questionnaire", hint: "Please fill out this ___ about your school experience." },
+    { word: "pronunciation", hint: "The ___ of that French word is quite tricky." },
+    { word: "acknowledge", hint: "She didn't ___ my wave across the street." },
+    { word: "bureaucracy", hint: "There was too much ___ and paperwork involved." },
+    { word: "catastrophe", hint: "Forgetting the cake was a birthday ___!" },
+    { word: "consequence", hint: "Every action has a ___." },
+    { word: "enthusiasm", hint: "She showed great ___ for the school play." },
+    { word: "maintenance", hint: "The building needs regular ___ to stay safe." },
+    { word: "neighbourhood", hint: "Everyone in the ___ helped clean up the park." },
+    { word: "professional", hint: "The footballer wants to become a ___ player." },
+    { word: "responsibility", hint: "Looking after the class pet is a big ___." },
+    { word: "simultaneously", hint: "They both pressed the button ___." },
+    { word: "unnecessary", hint: "Bringing five bags to school is completely ___." },
+    { word: "archaeology", hint: "She studied ___ to learn about ancient civilisations." },
+    { word: "conscientious", hint: "He was a very ___ student who always did his best." },
+    { word: "extraordinary", hint: "The acrobat performed an ___ backflip." },
+    { word: "Mediterranean", hint: "Greece is a country by the ___ Sea." },
+    { word: "refrigerator", hint: "Put the milk back in the ___ so it stays cold." }
+  ]
+};
+
+// ===== MATHS QUESTION GENERATORS =====
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+const MATHS = {
+  1: [
+    // Addition up to 20
+    () => { const a=rand(1,10),b=rand(1,10); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers together" }; },
+    () => { const a=rand(2,9),b=rand(2,9); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers together" }; },
+    // Subtraction up to 20
+    () => { const a=rand(10,20),b=rand(1,a-1); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
+    () => { const a=rand(5,15),b=rand(1,a-1); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
+    // Missing number bonds
+    () => { const total=rand(5,15),a=rand(1,total-1); return { question:`${a} + ? = ${total}`, answer:String(total-a), hint:"What number goes in the gap to make "+total+"?" }; },
+    // Counting in 2s, 5s, 10s
+    () => { const step=pick([2,5,10]),start=step*rand(1,4); return { question:`${start}, ${start+step}, ${start+step*2}, ?`, answer:String(start+step*3), hint:"Count in "+step+"s \u2014 what comes next?" }; },
+    // Doubles
+    () => { const a=rand(2,10); return { question:`Double ${a} = ?`, answer:String(a*2), hint:"What is "+a+" + "+a+"?" }; },
+  ],
+  2: [
+    // Addition up to 100
+    () => { const a=rand(10,60),b=rand(10,40); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
+    // Subtraction up to 100
+    () => { const a=rand(40,99),b=rand(10,a-1); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Subtract the second from the first" }; },
+    // Times tables: 2,3,4,5,10
+    () => { const t=pick([2,3,4,5,10]),b=rand(2,10); return { question:`${t} \u00d7 ${b} = ?`, answer:String(t*b), hint:t+" times table" }; },
+    () => { const t=pick([2,3,4,5,10]),b=rand(2,10); return { question:`${b} \u00d7 ${t} = ?`, answer:String(t*b), hint:t+" times table" }; },
+    // Simple division
+    () => { const t=pick([2,3,4,5,10]),b=rand(2,10),p=t*b; return { question:`${p} \u00f7 ${t} = ?`, answer:String(b), hint:"How many "+t+"s in "+p+"?" }; },
+    // Word problems
+    () => { const a=rand(15,45),b=rand(10,30); return { question:`You have ${a} stickers. Your friend gives you ${b} more. How many now?`, answer:String(a+b), hint:"This is an addition problem" }; },
+    () => { const a=rand(40,80),b=rand(10,a-5); return { question:`There are ${a} biscuits. You eat ${b}. How many are left?`, answer:String(a-b), hint:"This is a subtraction problem" }; },
+    () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} apples in each. How many apples?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
+  ],
+  3: [
+    // Addition up to 1000
+    () => { const a=rand(100,600),b=rand(100,400); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the numbers \u2014 start with the hundreds" }; },
+    // Subtraction up to 1000
+    () => { const a=rand(400,999),b=rand(100,a-50); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Subtract \u2014 you might need to borrow" }; },
+    // All times tables up to 12
+    () => { const a=rand(2,12),b=rand(2,12); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Times tables" }; },
+    () => { const a=rand(3,12),b=rand(2,12); return { question:`${b} \u00d7 ${a} = ?`, answer:String(a*b), hint:"Times tables" }; },
+    // Division (exact)
+    () => { const a=rand(2,12),b=rand(2,10),p=a*b; return { question:`${p} \u00f7 ${a} = ?`, answer:String(b), hint:"Division \u2014 how many "+a+"s in "+p+"?" }; },
+    // Simple fractions
+    () => { const d=pick([2,4,5,10]),n=rand(2,10)*d; return { question:`What is 1/${d} of ${n}?`, answer:String(n/d), hint:"Divide "+n+" by "+d }; },
+    () => { const n=rand(4,20)*2; return { question:`What is \u00bd of ${n}?`, answer:String(n/2), hint:"Divide by 2" }; },
+    () => { const n=rand(3,12)*4; return { question:`What is \u00bc of ${n}?`, answer:String(n/4), hint:"Divide by 4" }; },
+    // Word problems
+    () => { const a=rand(3,9),b=rand(4,12); return { question:`${a} shelves with ${b} books on each. How many books?`, answer:String(a*b), hint:"Multiplication word problem" }; },
+    () => { const total=rand(5,10)*pick([3,4,5,6]),groups=pick([3,4,5,6]); const pp=total/groups; if(pp!==Math.floor(pp)){ return { question:`7 \u00d7 8 = ?`, answer:"56", hint:"Times tables" }; } return { question:`${total} sweets shared equally among ${groups} children. How many each?`, answer:String(pp), hint:"Division word problem" }; },
+    () => { const a=rand(200,500),b=rand(100,300); return { question:`A school has ${a} girls and ${b} boys. How many children?`, answer:String(a+b), hint:"Addition word problem" }; },
+  ],
+  4: [
+    // Long multiplication
+    () => { const a=rand(12,35),b=rand(11,25); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Break it into parts: "+a+" \u00d7 "+Math.floor(b/10)*10+" and "+a+" \u00d7 "+(b%10) }; },
+    () => { const a=rand(15,50),b=rand(12,20); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Long multiplication" }; },
+    // Long division
+    () => { const d=rand(4,12),q=rand(10,25),p=d*q; return { question:`${p} \u00f7 ${d} = ?`, answer:String(q), hint:"Long division" }; },
+    // Fractions same denominator
+    () => { const d=pick([4,5,6,8]),a=rand(1,d-2),b=rand(1,d-a-1); return { question:`${a}/${d} + ${b}/${d} = ?`, answer:(a+b)+"/"+d, hint:"Add the tops, keep the bottom", acceptAlt:[String(((a+b)/d).toFixed(4).replace(/\.?0+$/,''))] }; },
+    // Decimals add
+    () => { const a=(rand(10,90)/10),b=(rand(10,90)/10); const s=Math.round((a+b)*10)/10; return { question:`${a.toFixed(1)} + ${b.toFixed(1)} = ?`, answer:String(s), hint:"Add the decimals" }; },
+    // Decimals subtract
+    () => { let a=(rand(40,99)/10),b=(rand(10,Math.floor(a*10)-5)/10); const s=Math.round((a-b)*10)/10; return { question:`${a.toFixed(1)} \u2212 ${b.toFixed(1)} = ?`, answer:String(s), hint:"Subtract the decimals" }; },
+    // Percentages
+    () => { const n=rand(2,20)*10; return { question:`10% of ${n} = ?`, answer:String(n/10), hint:"Divide by 10" }; },
+    () => { const n=rand(2,20)*4; return { question:`25% of ${n} = ?`, answer:String(n/4), hint:"Divide by 4" }; },
+    () => { const n=rand(2,20)*2; return { question:`50% of ${n} = ?`, answer:String(n/2), hint:"Divide by 2" }; },
+    // Word problems
+    () => { const price=rand(3,15),qty=rand(4,12),paid=price*qty+rand(5,20); const change=paid-price*qty; return { question:`You buy ${qty} pencils at \u20ac${price} each. You pay \u20ac${paid}. What change?`, answer:String(change), hint:"Find total cost, then subtract from what you paid" }; },
+    () => { const a=rand(100,400),b=rand(100,300),c=rand(50,200); return { question:`${a} + ${b} \u2212 ${c} = ?`, answer:String(a+b-c), hint:"Add first, then subtract" }; },
+  ],
+  5: [
+    // Fractions different denominators
+    () => { const pairs=[[2,3],[3,4],[2,5],[3,5],[4,5],[2,7],[3,8]]; const [d1,d2]=pick(pairs); const a=rand(1,d1-1),b=rand(1,d2-1); const lcd=d1*d2; const num=a*d2+b*d1; const g=gcd(num,lcd); return { question:`${a}/${d1} + ${b}/${d2} = ?`, answer:(num/g)+"/"+(lcd/g), hint:"Find a common denominator: "+(lcd), acceptAlt:[String((num/lcd).toFixed(4).replace(/\.?0+$/,''))] }; },
+    // Multiply fractions
+    () => { const a=rand(1,5),b=rand(2,6),c=rand(1,5),d=rand(2,6); const num=a*c,den=b*d; const g=gcd(num,den); return { question:`${a}/${b} \u00d7 ${c}/${d} = ?`, answer:(num/g)+"/"+(den/g), hint:"Multiply tops, multiply bottoms, then simplify", acceptAlt:[String((num/den).toFixed(4).replace(/\.?0+$/,''))] }; },
+    // Decimal multiplication
+    () => { const a=rand(11,35)/10,b=rand(11,25)/10; const r=Math.round(a*b*100)/100; return { question:`${a.toFixed(1)} \u00d7 ${b.toFixed(1)} = ?`, answer:String(r), hint:"Multiply, then place the decimal point" }; },
+    // Percentage of amount
+    () => { const pct=pick([5,10,15,20,25,30,40,50,75]),n=rand(2,20)*pick([4,10,20]); return { question:`${pct}% of ${n} = ?`, answer:String(pct*n/100), hint:"Find "+pct+"% \u2014 try breaking it into 10% and 1% steps" }; },
+    // Order of operations (BIMDAS)
+    () => { const a=rand(2,8),b=rand(2,6),c=rand(1,10); return { question:`${a} \u00d7 ${b} + ${c} = ?`, answer:String(a*b+c), hint:"Multiply first, then add (BIMDAS)" }; },
+    () => { const a=rand(10,30),b=rand(2,5),c=rand(2,5); return { question:`${a} \u2212 ${b} \u00d7 ${c} = ?`, answer:String(a-b*c), hint:"Multiply first, then subtract (BIMDAS)" }; },
+    () => { const a=rand(2,6),b=rand(2,6),c=rand(1,5); return { question:`(${a} + ${b}) \u00d7 ${c} = ?`, answer:String((a+b)*c), hint:"Brackets first! (BIMDAS)" }; },
+    // Complex word problems
+    () => { const each=rand(3,12),qty=rand(5,15),discount=rand(5,20); const total=each*qty-discount; return { question:`${qty} tickets at \u20ac${each} each, minus \u20ac${discount} discount. Total cost?`, answer:String(total), hint:"Multiply first, then subtract the discount" }; },
+    () => { const km=rand(100,400),litres=rand(20,50); const kpl=Math.round(km/litres*10)/10; return { question:`A car drives ${km}km using ${litres} litres. How many km per litre? (1 decimal)`, answer:String(kpl), hint:"Divide distance by litres" }; },
+  ]
+};
+
+function gcd(a,b) { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b];} return a; }
+
+// ===== CONSTANTS =====
+const LEVEL_NAMES = ["", "Explorer", "Adventurer", "Wizard", "Champion", "Legend"];
+const LEVEL_EMOJI = ["", "\uD83C\uDF0D", "\u26C8\uFE0F", "\uD83E\uDDD9", "\uD83C\uDFC6", "\u2B50"];
+const CORRECT_MSGS = ["Brilliant!", "Nailed it!", "Perfect!", "Amazing!", "You legend!", "Spot on!", "Superb!", "Class!", "Deadly!", "Well done!"];
+const WRONG_MSGS = ["Close!", "Nearly!", "Good try!", "Almost!", "Keep going!"];
+
+// ===== STATE =====
+let currentPlayerName = null;
+let currentMode = null; // 'spelling' | 'maths'
+let currentProfile = null;
+let currentQuestion = null; // { word, hint } for spelling OR { question, answer, hint, acceptAlt } for maths
+let usedWords = [];
+let waiting = false;
+
+function getProfile(mode, name) {
+  const key = mode + '_' + name;
+  const stored = localStorage.getItem(key);
+  if (stored) return JSON.parse(stored);
+  const defaultLevel = name === 'elsie' ? 3 : 1;
+  return {
+    name: name, mode: mode,
+    level: defaultLevel,
+    score: 0, streak: 0, bestStreak: 0,
+    correctAtLevel: 0, wrongAtLevel: 0
+  };
+}
+
+function saveProfile(profile) {
+  localStorage.setItem(profile.mode + '_' + profile.name, JSON.stringify(profile));
+}
+
+// ===== INIT =====
+function init() {
+  updateProfileInfo();
+}
+
+function updateProfileInfo() {
+  const es = getProfile('spelling','elsie'), ef = getProfile('spelling','freya');
+  document.getElementById('elsie-info').textContent = 'Spelling L' + es.level + ' \u2022 Maths L' + getProfile('maths','elsie').level;
+  document.getElementById('freya-info').textContent = 'Spelling L' + ef.level + ' \u2022 Maths L' + getProfile('maths','freya').level;
+}
+
+// ===== NAVIGATION =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() {
+  updateProfileInfo();
+  showScreen('screen-select');
+  currentPlayerName = null;
+  currentMode = null;
+  currentProfile = null;
+  usedWords = [];
+}
+
+function goModeSelect() {
+  selectPlayer(currentPlayerName);
+}
+
+function selectPlayer(name) {
+  currentPlayerName = name;
+  const displayName = name === 'elsie' ? 'Elsie' : 'Freya';
+  document.getElementById('mode-subtitle').textContent = displayName + "'s turn!";
+
+  const sp = getProfile('spelling', name);
+  const mp = getProfile('maths', name);
+  document.getElementById('spelling-level-info').textContent = LEVEL_NAMES[sp.level] + ' \u2022 Level ' + sp.level;
+  document.getElementById('maths-level-info').textContent = LEVEL_NAMES[mp.level] + ' \u2022 Level ' + mp.level;
+
+  showScreen('screen-mode');
+}
+
+// ===== GAME START =====
+function startGame(mode) {
+  currentMode = mode;
+  currentProfile = getProfile(mode, currentPlayerName);
+  usedWords = [];
+  showScreen('screen-game');
+
+  const tag = document.getElementById('player-tag');
+  tag.className = 'player-tag ' + currentPlayerName;
+  document.getElementById('player-name-tag').textContent = currentPlayerName === 'elsie' ? 'Elsie' : 'Freya';
+  document.getElementById('mode-tag-label').textContent = mode === 'spelling' ? '\uD83D\uDCDD Spelling' : '\uD83D\uDD22 Maths';
+
+  // Configure input
+  const input = document.getElementById('game-input');
+  if (mode === 'spelling') {
+    input.className = 'game-input spelling-input';
+    input.placeholder = 'Type the word...';
+    input.inputMode = 'text';
+    document.getElementById('btn-hear').style.display = 'flex';
+  } else {
+    input.className = 'game-input';
+    input.placeholder = 'Type your answer...';
+    input.inputMode = 'text';
+    document.getElementById('btn-hear').style.display = 'none';
+  }
+
+  updateUI();
+  nextQuestion();
+}
+
+function updateUI() {
+  const p = currentProfile;
+  document.getElementById('level-badge').innerHTML = LEVEL_EMOJI[p.level] + ' ' + LEVEL_NAMES[p.level] + ' \u00b7 Level ' + p.level;
+  document.getElementById('stat-score').textContent = p.score;
+  document.getElementById('stat-best').textContent = p.bestStreak;
+
+  let streakText = String(p.streak);
+  if (p.streak >= 3) streakText += ' \uD83D\uDD25';
+  if (p.streak >= 6) streakText += '\uD83D\uDD25';
+  if (p.streak >= 10) streakText += '\uD83D\uDD25';
+  document.getElementById('stat-streak').innerHTML = streakText;
+}
+
+// ===== NEXT QUESTION =====
+function nextQuestion() {
+  waiting = false;
+  const input = document.getElementById('game-input');
+  input.value = '';
+  input.className = currentMode === 'spelling' ? 'game-input spelling-input' : 'game-input';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('correct-answer').textContent = '';
+  document.getElementById('btn-check').textContent = 'Check \u2713';
+  document.getElementById('btn-check').onclick = checkAnswer;
+  input.disabled = false;
+  input.focus();
+
+  if (currentMode === 'spelling') {
+    document.getElementById('question-text').style.display = 'none';
+    document.getElementById('hint-text').style.display = 'block';
+
+    const levelWords = WORDS[currentProfile.level];
+    const available = levelWords.filter(w => !usedWords.includes(w.word));
+    let pool = available.length > 0 ? available : levelWords;
+    if (available.length === 0) usedWords = [];
+
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    currentQuestion = { word: pick.word, hint: pick.hint, answer: pick.word.toLowerCase() };
+    usedWords.push(pick.word);
+
+    document.getElementById('hint-text').innerHTML = pick.hint;
+    setTimeout(() => hearWord(), 400);
+  } else {
+    document.getElementById('question-text').style.display = 'block';
+    document.getElementById('hint-text').style.display = 'block';
+
+    const generators = MATHS[currentProfile.level];
+    const gen = generators[Math.floor(Math.random() * generators.length)];
+    currentQuestion = gen();
+
+    document.getElementById('question-text').textContent = currentQuestion.question;
+    document.getElementById('hint-text').textContent = currentQuestion.hint;
+  }
+}
+
+// ===== TTS =====
+function getIrishVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  return voices.find(v => v.lang === 'en-IE')
+    || voices.find(v => v.lang.startsWith('en-IE'))
+    || voices.find(v => v.name.toLowerCase().includes('moira'))
+    || voices.find(v => v.lang.startsWith('en-GB'))
+    || voices.find(v => v.lang.startsWith('en'));
+}
+
+function hearWord() {
+  if (!currentQuestion || currentMode !== 'spelling') return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(currentQuestion.word);
+  utter.rate = 0.85;
+  utter.pitch = 1;
+  const voice = getIrishVoice();
+  if (voice) utter.voice = voice;
+  window.speechSynthesis.speak(utter);
+}
+
+// ===== CHECK ANSWER =====
+function checkAnswer() {
+  if (waiting) return;
+
+  const input = document.getElementById('game-input');
+  const raw = input.value.trim();
+  if (!raw) return;
+
+  let correct = false;
+
+  if (currentMode === 'spelling') {
+    correct = raw.toLowerCase() === currentQuestion.answer;
+  } else {
+    // Normalise answer comparison
+    const userAns = raw.replace(/\s/g, '').toLowerCase();
+    const expected = String(currentQuestion.answer).replace(/\s/g, '').toLowerCase();
+
+    correct = userAns === expected;
+
+    // Check alternative accepted answers (decimal equivalents of fractions, etc.)
+    if (!correct && currentQuestion.acceptAlt) {
+      correct = currentQuestion.acceptAlt.some(alt => {
+        const normAlt = String(alt).replace(/\s/g, '').toLowerCase();
+        return userAns === normAlt;
+      });
+    }
+
+    // Numeric tolerance for decimals
+    if (!correct) {
+      const userNum = parseFloat(userAns);
+      const expNum = parseFloat(expected);
+      if (!isNaN(userNum) && !isNaN(expNum) && Math.abs(userNum - expNum) < 0.01) {
+        correct = true;
+      }
+    }
+  }
+
+  const p = currentProfile;
+
+  if (correct) {
+    input.classList.add('correct');
+    document.getElementById('feedback').textContent = CORRECT_MSGS[Math.floor(Math.random() * CORRECT_MSGS.length)];
+    document.getElementById('feedback').className = 'feedback correct-fb';
+    p.score++;
+    p.streak++;
+    if (p.streak > p.bestStreak) p.bestStreak = p.streak;
+    p.correctAtLevel++;
+    p.wrongAtLevel = 0;
+
+    spawnConfetti();
+
+    if (p.correctAtLevel >= 3 && p.level < 5) {
+      p.level++;
+      p.correctAtLevel = 0;
+      p.wrongAtLevel = 0;
+      saveProfile(p);
+      updateUI();
+      showLevelChange('up');
+      setTimeout(() => nextQuestion(), 2200);
+      waiting = true;
+      return;
+    }
+  } else {
+    input.classList.add('wrong');
+    document.getElementById('feedback').textContent = WRONG_MSGS[Math.floor(Math.random() * WRONG_MSGS.length)];
+    document.getElementById('feedback').className = 'feedback wrong-fb';
+
+    // Show correct answer
+    if (currentMode === 'spelling') {
+      document.getElementById('correct-answer').textContent = currentQuestion.word;
+      setTimeout(() => {
+        const utter = new SpeechSynthesisUtterance(currentQuestion.word);
+        utter.rate = 0.7;
+        const voice = getIrishVoice();
+        if (voice) utter.voice = voice;
+        window.speechSynthesis.speak(utter);
+      }, 300);
+    } else {
+      document.getElementById('correct-answer').textContent = currentQuestion.answer;
+    }
+
+    p.streak = 0;
+    p.wrongAtLevel++;
+    p.correctAtLevel = 0;
+
+    if (p.wrongAtLevel >= 2 && p.level > 1) {
+      p.level--;
+      p.correctAtLevel = 0;
+      p.wrongAtLevel = 0;
+      saveProfile(p);
+      updateUI();
+      showLevelChange('down');
+      setTimeout(() => nextQuestion(), 2200);
+      waiting = true;
+      return;
+    }
+  }
+
+  saveProfile(p);
+  updateUI();
+
+  waiting = true;
+  document.getElementById('btn-check').textContent = 'Next \u2192';
+  document.getElementById('btn-check').onclick = () => nextQuestion();
+  input.disabled = true;
+}
+
+// ===== EFFECTS =====
+function showLevelChange(direction) {
+  const div = document.createElement('div');
+  div.className = 'level-change ' + direction;
+  if (direction === 'up') {
+    div.innerHTML = '<div class="emoji">\uD83D\uDE80</div><div class="msg">Level Up! ' + LEVEL_NAMES[currentProfile.level] + '!</div>';
+  } else {
+    div.innerHTML = '<div class="emoji">\uD83D\uDCAA</div><div class="msg">Let\'s practise at ' + LEVEL_NAMES[currentProfile.level] + '</div>';
+  }
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 2100);
+}
+
+function spawnConfetti() {
+  const colors = ['#ff6b9d', '#c084fc', '#60a5fa', '#34d399', '#fbbf24', '#fb923c'];
+  for (let i = 0; i < 20; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.top = '-10px';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 0.5 + 's';
+    piece.style.animationDuration = (1 + Math.random()) + 's';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 2000);
+  }
+}
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('screen-game').classList.contains('active')) {
+      if (waiting) {
+        nextQuestion();
+      } else {
+        checkAnswer();
+      }
+    }
+  }
+});
+
+// Load voices
+window.speechSynthesis.onvoiceschanged = () => {};
+window.speechSynthesis.getVoices();
+
+init();
+</script>
+</body>
+</html>
