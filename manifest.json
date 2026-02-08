@@ -2,7 +2,7 @@
   "name": "FIO - Figure it Out",
   "short_name": "FIO",
   "description": "Spelling & Maths learning game for Elsie and Freya",
-  "start_url": "./spelling-game.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#1e1b4b",
   "theme_color": "#1e1b4b",
