@@ -354,6 +354,22 @@
   .teddy-feedback.correct-fb { color: var(--green); }
   .teddy-feedback.wrong-fb { color: var(--pink); }
 
+  /* Numberblocks block towers & arrays */
+  .nb-tower { display: inline-flex; flex-direction: column-reverse; align-items: center; margin: 0 6px; }
+  .nb-block { width: 28px; height: 28px; border-radius: 4px; margin: 1px 0; border: 1px solid rgba(0,0,0,0.15); }
+  .nb-label { font-size: 1rem; font-weight: 700; margin-top: 2px; color: var(--text); }
+  .nb-sum { display: flex; align-items: flex-end; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .nb-op { font-size: 1.5rem; font-weight: 700; align-self: center; color: var(--text); }
+  .nb-array { display: inline-grid; gap: 2px; }
+  .nb-array .nb-block { width: 24px; height: 24px; }
+  .nb-array-label { font-size: 0.9rem; font-weight: 600; margin-top: 4px; color: var(--text); text-align: center; }
+  /* Smaller blocks for Elsie/Freya visual area */
+  .nb-sm .nb-block { width: 20px; height: 20px; }
+  .nb-sm .nb-label { font-size: 0.85rem; }
+  .nb-sm .nb-array .nb-block { width: 18px; height: 18px; }
+  /* Visual area for Elsie/Freya game */
+  .question-visual { margin: 8px 0; min-height: 0; display: flex; justify-content: center; align-items: flex-end; }
+
   @media (max-width: 500px) {
     body { padding: 12px; padding-top: env(safe-area-inset-top, 12px); }
     h1 { font-size: 1.8rem; }
@@ -490,6 +506,7 @@
 
   <div class="game-card">
     <div class="question-text" id="question-text" style="display:none"></div>
+    <div class="question-visual" id="question-visual" style="display:none"></div>
     <div class="hint-text" id="hint-text"></div>
     <div class="input-row">
       <button class="btn btn-hear" id="btn-hear" onclick="hearWord()" title="Hear the word again">&#128264;</button>
@@ -667,13 +684,26 @@ function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 const MATHS = {
   1: [
-    () => { const a=rand(1,10),b=rand(1,10); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers together" }; },
+    // Single-digit addition (warm-up, low frequency ~9%)
     () => { const a=rand(2,9),b=rand(2,9); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers together" }; },
-    () => { const a=rand(10,20),b=rand(1,a-1); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
-    () => { const a=rand(5,15),b=rand(1,a-1); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
-    () => { const total=rand(5,15),a=rand(1,total-1); return { question:`${a} + ? = ${total}`, answer:String(total-a), hint:"What number goes in the gap to make "+total+"?" }; },
+    // 2-digit addition
+    () => { const a=rand(10,50),b=rand(10,40); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
+    () => { const a=rand(15,60),b=rand(5,30); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
+    // 2-digit subtraction
+    () => { const a=rand(20,60),b=rand(5,a-3); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
+    () => { const a=rand(30,80),b=rand(10,a-5); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
+    // Missing number (2-digit range)
+    () => { const total=rand(15,50),a=rand(5,total-5); return { question:`${a} + ? = ${total}`, answer:String(total-a), hint:"What number goes in the gap to make "+total+"?" }; },
+    // x2 tables with block array visual
+    () => { const b=rand(2,10); return { question:`2 \u00d7 ${b} = ?`, answer:String(2*b), hint:"2 times table", visual:'<div class="nb-sm">'+makeMultiplicationVisual(2,b)+'</div>' }; },
+    // x5 tables with block array visual
+    () => { const b=rand(2,10); return { question:`5 \u00d7 ${b} = ?`, answer:String(5*b), hint:"5 times table", visual:'<div class="nb-sm">'+makeMultiplicationVisual(5,b)+'</div>' }; },
+    // Counting pattern
     () => { const step=pick([2,5,10]),start=step*rand(1,4); return { question:`${start}, ${start+step}, ${start+step*2}, ?`, answer:String(start+step*3), hint:"Count in "+step+"s \u2014 what comes next?" }; },
-    () => { const a=rand(2,10); return { question:`Double ${a} = ?`, answer:String(a*2), hint:"What is "+a+" + "+a+"?" }; },
+    // Word problem (addition)
+    () => { const a=rand(15,45),b=rand(10,30); return { question:`You have ${a} stickers. Your friend gives you ${b} more. How many now?`, answer:String(a+b), hint:"This is an addition problem" }; },
+    // Word problem (multiplication)
+    () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} sweets in each. How many sweets?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
   ],
   2: [
     () => { const a=rand(10,60),b=rand(10,40); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
@@ -686,17 +716,30 @@ const MATHS = {
     () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} apples in each. How many apples?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
   ],
   3: [
-    () => { const a=rand(100,600),b=rand(100,400); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the numbers \u2014 start with the hundreds" }; },
-    () => { const a=rand(400,999),b=rand(100,a-50); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Subtract \u2014 you might need to borrow" }; },
+    // 2-digit addition (mental maths, not pencil-and-paper)
+    () => { const a=rand(50,200),b=rand(30,150); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the numbers mentally" }; },
+    // 2-digit subtraction
+    () => { const a=rand(60,200),b=rand(20,a-10); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Subtract \u2014 try counting up from the smaller number" }; },
+    // Times tables (up to 12x12)
     () => { const a=rand(2,12),b=rand(2,12); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Times tables" }; },
+    // Times tables reversed
     () => { const a=rand(3,12),b=rand(2,12); return { question:`${b} \u00d7 ${a} = ?`, answer:String(a*b), hint:"Times tables" }; },
+    // Division (clean)
     () => { const a=rand(2,12),b=rand(2,10),p=a*b; return { question:`${p} \u00f7 ${a} = ?`, answer:String(b), hint:"Division \u2014 how many "+a+"s in "+p+"?" }; },
-    () => { const d=pick([2,4,5,10]),n=rand(2,10)*d; return { question:`What is 1/${d} of ${n}?`, answer:String(n/d), hint:"Divide "+n+" by "+d }; },
-    () => { const n=rand(4,20)*2; return { question:`What is \u00bd of ${n}?`, answer:String(n/2), hint:"Divide by 2" }; },
-    () => { const n=rand(3,12)*4; return { question:`What is \u00bc of ${n}?`, answer:String(n/4), hint:"Divide by 4" }; },
-    () => { const a=rand(3,9),b=rand(4,12); return { question:`${a} shelves with ${b} books on each. How many books?`, answer:String(a*b), hint:"Multiplication word problem" }; },
-    () => { const total=rand(5,10)*pick([3,4,5,6]),groups=pick([3,4,5,6]); const pp=total/groups; if(pp!==Math.floor(pp)){ return { question:`7 \u00d7 8 = ?`, answer:"56", hint:"Times tables" }; } return { question:`${total} sweets shared equally among ${groups} children. How many each?`, answer:String(pp), hint:"Division word problem" }; },
-    () => { const a=rand(200,500),b=rand(100,300); return { question:`A school has ${a} girls and ${b} boys. How many children?`, answer:String(a+b), hint:"Addition word problem" }; },
+    // Division with remainder
+    () => { const a=rand(2,9),q=rand(3,10),r=rand(1,a-1),p=a*q+r; return { question:`${p} \u00f7 ${a} = ? remainder ?`, answer:q+" r "+r, hint:"Divide and find the remainder", acceptAlt:[q+" remainder "+r, q+"r"+r, q+" R "+r] }; },
+    // 10% of N
+    () => { const n=rand(2,20)*10; return { question:`10% of ${n} = ?`, answer:String(n/10), hint:"Divide by 10" }; },
+    // 25% or 50% of N
+    () => { const pct=pick([25,50]); const div=pct===25?4:2; const n=rand(2,20)*div; return { question:`${pct}% of ${n} = ?`, answer:String(n/div), hint:"Divide by "+div }; },
+    // Fractions (half and quarter)
+    () => { const d=pick([2,4]); const n=rand(4,20)*d; return { question:`What is ${d===2?'\u00bd':'\u00bc'} of ${n}?`, answer:String(n/d), hint:"Divide by "+d }; },
+    // Word problem — multiplication
+    () => { const a=rand(3,9),b=rand(4,12); return { question:`${a} rows with ${b} seats in each row. How many seats?`, answer:String(a*b), hint:"Multiplication word problem" }; },
+    // Word problem — division (fixed, no fallback bug)
+    () => { const groups=pick([3,4,5,6]),per=rand(3,8),total=groups*per; return { question:`${total} sweets shared equally among ${groups} children. How many each?`, answer:String(per), hint:"Division word problem" }; },
+    // Word problem — multi-step (money)
+    () => { const price=rand(3,12),qty=rand(2,5),budget=price*qty+rand(2,15); const change=budget-price*qty; return { question:`You buy ${qty} books at \u20ac${price} each. You pay with \u20ac${budget}. What change?`, answer:String(change), hint:"Find total cost, then subtract from what you paid" }; },
   ],
   4: [
     () => { const a=rand(12,35),b=rand(11,25); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Break it into parts: "+a+" \u00d7 "+Math.floor(b/10)*10+" and "+a+" \u00d7 "+(b%10) }; },
@@ -838,11 +881,58 @@ function makeCountVisual(count, emoji) {
   return (emoji + ' ').repeat(5).trim() + '  ' + (emoji + ' ').repeat(count - 5).trim();
 }
 
+// ===== NUMBERBLOCKS VISUALS =====
+const NB_COLOURS = {
+  1:'#EE4035', 2:'#F37921', 3:'#FCE51B', 4:'#27AE60', 5:'#2D9CDB',
+  6:'#7B61FF', 7:'linear-gradient(135deg,#EE4035,#F37921,#FCE51B,#27AE60,#2D9CDB,#7B61FF)',
+  8:'#E91E8E', 9:'#1A5276', 10:'#DAA520'
+};
+
+function makeBlockTower(n, showLabel) {
+  if (showLabel === undefined) showLabel = true;
+  const col = NB_COLOURS[n] || NB_COLOURS[Math.min(n, 10)];
+  const isGradient = col.includes('gradient');
+  const style = isGradient ? 'background:' + col : 'background-color:' + col;
+  let blocks = '';
+  for (let i = 0; i < n; i++) blocks += '<div class="nb-block" style="' + style + '"></div>';
+  let label = showLabel ? '<div class="nb-label">' + n + '</div>' : '';
+  return '<div class="nb-tower">' + blocks + label + '</div>';
+}
+
+function makeBlockArray(rows, cols) {
+  const col = NB_COLOURS[rows] || NB_COLOURS[Math.min(rows, 10)];
+  const isGradient = col.includes('gradient');
+  const style = isGradient ? 'background:' + col : 'background-color:' + col;
+  let cells = '';
+  for (let i = 0; i < rows * cols; i++) cells += '<div class="nb-block" style="' + style + '"></div>';
+  return '<div class="nb-array" style="grid-template-columns:repeat(' + cols + ',24px)">' + cells + '</div>';
+}
+
+function makeAdditionVisual(a, b) {
+  return '<div class="nb-sum">' +
+    makeBlockTower(a) +
+    '<span class="nb-op">+</span>' +
+    makeBlockTower(b) +
+    '<span class="nb-op">=</span>' +
+    '<span class="nb-op">?</span>' +
+    '</div>';
+}
+
+function makeMultiplicationVisual(a, b) {
+  return '<div style="text-align:center">' +
+    makeBlockArray(a, b) +
+    '<div class="nb-array-label">' + a + ' \u00d7 ' + b + '</div>' +
+    '</div>';
+}
+
 const TEDDY_Q = {
   1: [
-    // Counting 1-3
+    // Emoji counting 1-3 (keep — Teddy likes it)
     () => { const n=rand(1,3); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:`How many ${item.plural}?` }; },
-    () => { const n=rand(1,3); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:`How many ${item.plural}?` }; },
+    // Block tower counting 1-3
+    () => { const n=rand(1,3); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'How many blocks?' }; },
+    // Simple addition with towers: 1+1, 1+2, 2+1
+    () => { const a=rand(1,2),b=rand(1,2); return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(a+b,1,4,4), answer: String(a+b), speak:`${a} plus ${b}?` }; },
     // Colours (4 basic) — show coloured object, tap matching colour circle
     () => { const colours=TEDDY_COLOURS[1]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: shuffleArray(emojis), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
     // Shapes (3 basic) — show real-world shaped object, tap matching shape
@@ -851,9 +941,12 @@ const TEDDY_Q = {
     () => { const n=rand(1,3); const digits=['1\uFE0F\u20E3','2\uFE0F\u20E3','3\uFE0F\u20E3','4\uFE0F\u20E3']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'What number is this?' }; },
   ],
   2: [
-    // Counting 1-5
+    // Emoji counting 1-5 (keep)
     () => { const n=rand(1,5); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:`How many ${item.plural}?` }; },
-    () => { const n=rand(1,5); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:`How many ${item.plural}?` }; },
+    // Block tower counting 1-5
+    () => { const n=rand(1,5); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:'How many blocks?' }; },
+    // Addition with towers
+    () => { const a=rand(1,4),b=rand(1,4); const s=a+b; return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(s,1,9,4), answer: String(s), speak:`${a} plus ${b}?` }; },
     // Colours (7) — show coloured object, tap matching colour circle
     () => { const colours=TEDDY_COLOURS[2]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: makeDistractors(c.emoji, emojis, 4), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
     // Shapes (6) — show real-world shaped object, tap matching shape
@@ -865,12 +958,16 @@ const TEDDY_Q = {
     () => { const letters=TEDDY_LETTERS[2]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Tap the letter: ${PHONEMES[l]}`, visual: '', choices: choices, answer: l.toUpperCase(), speak: PHONEMES[l] }; },
   ],
   3: [
-    // Counting 1-10 with "5 and a bit"
+    // Emoji counting 1-10 with "5 and a bit" (keep)
     () => { const n=rand(1,10); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:`How many ${item.plural}?` }; },
+    // Block tower counting 1-10
+    () => { const n=rand(1,10); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:'How many blocks?' }; },
+    // Addition with towers
+    () => { const a=rand(1,5),b=rand(1,5); const s=a+b; return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(s,2,10,4), answer: String(s), speak:`${a} plus ${b}?` }; },
+    // Multiplication with arrays (2x2 to 3x4)
+    () => { const a=rand(2,3),b=rand(2,4); const p=a*b; return { prompt:`${a} times ${b}?`, visual: makeMultiplicationVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(p,2,12,4), answer: String(p), speak:`${a} times ${b}?` }; },
     // Number recognition 1-10
     () => { const n=rand(1,10); return { prompt:'What number is this?', visual: `<span style="font-size:4rem;font-weight:700">${n}</span>`, visualIsHTML: true, choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:'What number is this?' }; },
-    // Quantity to digit match
-    () => { const n=rand(2,8); const item=pick(TEDDY_ITEMS); return { prompt:'How many? Tap the number!', visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:'How many? Tap the number!' }; },
     // Colours (full set) — show coloured object, tap matching colour circle
     () => { const colours=TEDDY_COLOURS[3]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: makeDistractors(c.emoji, emojis, 4), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
     // Shapes (full set) — show real-world shaped object, tap matching shape
@@ -879,8 +976,23 @@ const TEDDY_Q = {
     () => { const letters=TEDDY_LETTERS[3]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Which letter makes the "${PHONEMES[l]}" sound?`, visual: l.toUpperCase(), choices: choices, answer: l.toUpperCase(), speak:`Which letter makes the ${PHONEMES[l]} sound?` }; },
     () => { const letters=TEDDY_LETTERS[3]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Tap the letter: ${PHONEMES[l]}`, visual: '', choices: choices, answer: l.toUpperCase(), speak: PHONEMES[l] }; },
     // More / Less — show both groups in visual area, tap the bigger number
-    () => { const a=rand(1,4),b=rand(a+2,9); const itemA=pick(TEDDY_ITEMS),itemB=pick(TEDDY_ITEMS); const va=makeCountVisual(a,itemA.emoji), vb=makeCountVisual(b,itemB.emoji); return { prompt:'Which group has MORE?', visual: va + '&nbsp; &nbsp;or&nbsp; &nbsp;' + vb, visualIsHTML: true, choices: makeNumberDistractors(b,1,10,4), answer: String(b), speak:'Which group has more?' }; },
+    () => { const a=rand(1,4),b=rand(a+2,9); const itemA=pick(TEDDY_ITEMS),itemB=pick(TEDDY_ITEMS); const va=makeCountVisual(a,itemA.emoji), vb=makeCountVisual(b,itemB.emoji); const ordered=Math.random()<0.5?[itemA.emoji,itemB.emoji]:[itemB.emoji,itemA.emoji]; return { prompt:'Which group has MORE?', visual: va + '&nbsp; &nbsp;or&nbsp; &nbsp;' + vb, visualIsHTML: true, choices: ordered, answer: itemB.emoji, speak:'Which group has more?' }; },
   ]
+};
+
+// ===== TYPE TAGS (parallel to generator arrays) =====
+const MATHS_TAGS = {
+  1: ['add-1d','add-2d','add-2d','sub-2d','sub-2d','missing','times-2','times-5','pattern','word-add','word-mult'],
+  2: ['add-2d','sub-2d','times','times','division','word-add','word-sub','word-mult'],
+  3: ['add-mental','sub-mental','times','times','division','div-rem','pct','pct','fractions','word-mult','word-div','word-money'],
+  4: ['long-mult','long-mult','long-div','frac-add','dec-add','dec-sub','pct','pct','pct','word-money','multi-step'],
+  5: ['frac-add','frac-mult','dec-mult','pct','bimdas','bimdas','bimdas','word-money','word-rate']
+};
+
+const TEDDY_TAGS = {
+  1: ['counting','block-count','addition','colours','shapes','number-recog'],
+  2: ['counting','block-count','addition','colours','shapes','number-recog','letter-sound','letter-tap'],
+  3: ['counting','block-count','addition','mult-array','number-recog','colours','shapes','letter-sound','letter-tap','more-less']
 };
 
 // ===== CONSTANTS =====
@@ -918,11 +1030,74 @@ function recordAnswer(profile, isCorrect) {
   }
 }
 
+// Per-type performance tracking (granular adaptive)
+function recordTypeResult(profile, level, tag, isCorrect) {
+  if (!profile.typeStats) profile.typeStats = {};
+  const key = level + ':' + tag;
+  if (!profile.typeStats[key]) profile.typeStats[key] = { right: 0, wrong: 0 };
+  const s = profile.typeStats[key];
+  if (isCorrect) s.right++; else s.wrong++;
+  // Decay: halve when history > 20 to bias toward recent performance
+  if (s.right + s.wrong > 20) {
+    s.right = Math.floor(s.right / 2);
+    s.wrong = Math.floor(s.wrong / 2);
+  }
+}
+
+// Weighted question selection: inverse-success-rate weighting
+function selectWeighted(generators, tags, profile, level, lastTags, missedTypes) {
+  const stats = profile.typeStats || {};
+  const weights = generators.map(function(gen, i) {
+    const tag = tags[i];
+    const key = level + ':' + tag;
+    const s = stats[key];
+    if (!s || (s.right + s.wrong) < 3) return 1.5; // exploration bonus
+    var rate = s.right / (s.right + s.wrong);
+    // Inverse: struggling→high weight, strong→low weight
+    var w = 1 / (rate + 0.1);
+    return Math.max(0.3, Math.min(3.0, w));
+  });
+  // Session missed boost
+  var missed = missedTypes || [];
+  weights.forEach(function(w, i) {
+    var count = missed.filter(function(t) { return t === tags[i]; }).length;
+    if (count > 0) weights[i] *= (1 + count * 0.5);
+  });
+  // Repeat prevention: zero-out last 2 tags (re-enabled if all zeroed)
+  if (lastTags && lastTags.length > 0) {
+    var hasNonZero = false;
+    weights.forEach(function(w, i) {
+      if (lastTags.includes(tags[i])) weights[i] = 0;
+      else if (w > 0) hasNonZero = true;
+    });
+    if (!hasNonZero) { // all zeroed — re-enable all
+      generators.forEach(function(g, i) {
+        var tag = tags[i], key = level + ':' + tag;
+        var s = stats[key];
+        weights[i] = (!s || (s.right+s.wrong)<3) ? 1.5 : Math.max(0.3, Math.min(3.0, 1/(s.right/(s.right+s.wrong)+0.1)));
+      });
+    }
+  }
+  // Weighted random pick
+  var total = weights.reduce(function(a,b){return a+b;}, 0);
+  var r = Math.random() * total;
+  for (var i = 0; i < generators.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return { gen: generators[i], idx: i, tag: tags[i] };
+  }
+  return { gen: generators[generators.length-1], idx: generators.length-1, tag: tags[tags.length-1] };
+}
+
 // ===== STATE =====
 let currentPlayerName = null;
 let currentMode = null;
 let currentProfile = null;
 let currentQuestion = null;
+let currentQuestionTag = null;
+let lastMathTags = [];
+let lastTeddyTags = [];
+let missedMathTypes = [];
+let missedTeddyTypes = [];
 let usedWords = [];
 let missedWords = []; // spelling: words gotten wrong, for recycling
 let waiting = false;
@@ -933,15 +1108,16 @@ function getProfile(mode, name) {
   const stored = localStorage.getItem(key);
   if (stored) {
     const p = JSON.parse(stored);
-    // Migration: add recentAnswers if missing
+    // Migration: add recentAnswers and typeStats if missing
     if (!p.recentAnswers) p.recentAnswers = [];
+    if (!p.typeStats) p.typeStats = {};
     return p;
   }
   if (name === 'teddy') {
-    return { name:'teddy', mode:'mixed', level:1, score:0, streak:0, bestStreak:0, recentAnswers:[] };
+    return { name:'teddy', mode:'mixed', level:1, score:0, streak:0, bestStreak:0, recentAnswers:[], typeStats:{} };
   }
   const defaultLevel = name === 'elsie' ? 3 : 1;
-  return { name:name, mode:mode, level:defaultLevel, score:0, streak:0, bestStreak:0, recentAnswers:[] };
+  return { name:name, mode:mode, level:defaultLevel, score:0, streak:0, bestStreak:0, recentAnswers:[], typeStats:{} };
 }
 
 function saveProfile(profile) {
@@ -975,6 +1151,8 @@ function goHome() {
   currentProfile = null;
   usedWords = [];
   missedWords = [];
+  lastMathTags = []; lastTeddyTags = [];
+  missedMathTypes = []; missedTeddyTypes = [];
 }
 
 function goModeSelect() {
@@ -1059,6 +1237,8 @@ function nextQuestion() {
 
   if (currentMode === 'spelling') {
     document.getElementById('question-text').style.display = 'none';
+    document.getElementById('question-visual').style.display = 'none';
+    document.getElementById('question-visual').innerHTML = '';
     document.getElementById('hint-text').style.display = 'block';
 
     // Missed word recycling: 40% chance to pull from missed words
@@ -1089,11 +1269,25 @@ function nextQuestion() {
     document.getElementById('hint-text').style.display = 'block';
 
     const generators = MATHS[currentProfile.level];
-    const gen = generators[Math.floor(Math.random() * generators.length)];
-    currentQuestion = gen();
+    const tags = MATHS_TAGS[currentProfile.level];
+    const sel = selectWeighted(generators, tags, currentProfile, currentProfile.level, lastMathTags, missedMathTypes);
+    currentQuestion = sel.gen();
+    currentQuestionTag = sel.tag;
+    lastMathTags.push(sel.tag);
+    if (lastMathTags.length > 2) lastMathTags.shift();
 
     document.getElementById('question-text').textContent = currentQuestion.question;
     document.getElementById('hint-text').textContent = currentQuestion.hint;
+
+    // Render optional visual (e.g. block arrays for multiplication)
+    const vizEl = document.getElementById('question-visual');
+    if (currentQuestion.visual) {
+      vizEl.style.display = 'flex';
+      vizEl.innerHTML = currentQuestion.visual;
+    } else {
+      vizEl.style.display = 'none';
+      vizEl.innerHTML = '';
+    }
   }
 }
 
@@ -1173,6 +1367,11 @@ function checkAnswer() {
     }
 
     recordAnswer(p, true);
+    if (currentMode === 'maths' && currentQuestionTag) {
+      recordTypeResult(p, p.level, currentQuestionTag, true);
+      var idx = missedMathTypes.indexOf(currentQuestionTag);
+      if (idx !== -1) missedMathTypes.splice(idx, 1);
+    }
     spawnConfetti();
 
     const adaptive = checkAdaptive(p, maxLevel);
@@ -1206,6 +1405,10 @@ function checkAnswer() {
 
     p.streak = 0;
     recordAnswer(p, false);
+    if (currentMode === 'maths' && currentQuestionTag) {
+      recordTypeResult(p, p.level, currentQuestionTag, false);
+      missedMathTypes.push(currentQuestionTag);
+    }
 
     const adaptive = checkAdaptive(p, maxLevel);
     if (adaptive === 'down') {
@@ -1256,8 +1459,12 @@ function nextTeddyQuestion() {
 
   const level = currentProfile.level || 1;
   const generators = TEDDY_Q[level] || TEDDY_Q[1];
-  const gen = generators[Math.floor(Math.random() * generators.length)];
-  currentQuestion = gen();
+  const tags = TEDDY_TAGS[level] || TEDDY_TAGS[1];
+  const sel = selectWeighted(generators, tags, currentProfile, level, lastTeddyTags, missedTeddyTypes);
+  currentQuestion = sel.gen();
+  currentQuestionTag = sel.tag;
+  lastTeddyTags.push(sel.tag);
+  if (lastTeddyTags.length > 2) lastTeddyTags.shift();
 
   document.getElementById('teddy-prompt').textContent = currentQuestion.prompt;
 
@@ -1309,6 +1516,11 @@ function checkTeddyAnswer(chosen, btnEl) {
     teddySessionScore++;
     updateTeddyStars();
     recordAnswer(p, true);
+    if (currentQuestionTag) {
+      recordTypeResult(p, p.level, currentQuestionTag, true);
+      var idx = missedTeddyTypes.indexOf(currentQuestionTag);
+      if (idx !== -1) missedTeddyTypes.splice(idx, 1);
+    }
     spawnConfetti();
 
     setTimeout(() => speakText(pick(TEDDY_CORRECT), 0.9), 200);
@@ -1340,6 +1552,10 @@ function checkTeddyAnswer(chosen, btnEl) {
 
     p.streak = 0;
     recordAnswer(p, false);
+    if (currentQuestionTag) {
+      recordTypeResult(p, p.level, currentQuestionTag, false);
+      missedTeddyTypes.push(currentQuestionTag);
+    }
 
     setTimeout(() => speakText("Nearly! It's " + spokenAnswer, 0.85), 200);
 
