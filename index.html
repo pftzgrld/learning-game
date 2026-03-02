@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e1b4b">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e1b4b'/><text y='68' x='50' text-anchor='middle' font-size='50'>🎓</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e1b4b'/><text y='68' x='50' text-anchor='middle' font-size='50'>üéì</text></svg>">
 <title>Learning Game</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -84,7 +84,7 @@
     font-size: 2.5rem;
   }
 
-  .profile-btn:nth-child(1) .profile-avatar { background: linear-gradient(135deg, var(--pink), var(--purple)); }
+  .profile-btn:nth-child(1) .profile-avatar { background: linear-gradient(135deg, #ff6b6b, #ffa500, #ffd700, #34d399, #60a5fa, #c084fc); }
   .profile-btn:nth-child(2) .profile-avatar { background: linear-gradient(135deg, var(--blue), var(--green)); }
   .profile-btn:nth-child(3) .profile-avatar { background: linear-gradient(135deg, var(--yellow), var(--orange)); }
 
@@ -704,6 +704,8 @@ const MATHS = {
     () => { const a=rand(15,45),b=rand(10,30); return { question:`You have ${a} stickers. Your friend gives you ${b} more. How many now?`, answer:String(a+b), hint:"This is an addition problem" }; },
     // Word problem (multiplication)
     () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} sweets in each. How many sweets?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
+    // Clock reading ‚Äî o'clock and half past
+    () => { const h=rand(1,12),m=pick([0,30]); return { question:'What time is it?', answer:formatClockAnswer(h,m), hint:m===0?"The minute hand points to 12":"The minute hand points to 6", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
   ],
   2: [
     () => { const a=rand(10,60),b=rand(10,40); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
@@ -714,6 +716,8 @@ const MATHS = {
     () => { const a=rand(15,45),b=rand(10,30); return { question:`You have ${a} stickers. Your friend gives you ${b} more. How many now?`, answer:String(a+b), hint:"This is an addition problem" }; },
     () => { const a=rand(40,80),b=rand(10,a-5); return { question:`There are ${a} biscuits. You eat ${b}. How many are left?`, answer:String(a-b), hint:"This is a subtraction problem" }; },
     () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} apples in each. How many apples?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
+    // Clock reading ‚Äî o'clock, half past, quarter past/to
+    () => { const h=rand(1,12),m=pick([0,15,30,45]); return { question:'What time is it?', answer:formatClockAnswer(h,m), hint:"Read the hour hand first, then the minute hand", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
   ],
   3: [
     // 2-digit addition (mental maths, not pencil-and-paper)
@@ -734,12 +738,14 @@ const MATHS = {
     () => { const pct=pick([25,50]); const div=pct===25?4:2; const n=rand(2,20)*div; return { question:`${pct}% of ${n} = ?`, answer:String(n/div), hint:"Divide by "+div }; },
     // Fractions (half and quarter)
     () => { const d=pick([2,4]); const n=rand(4,20)*d; return { question:`What is ${d===2?'\u00bd':'\u00bc'} of ${n}?`, answer:String(n/d), hint:"Divide by "+d }; },
-    // Word problem — multiplication
+    // Word problem ‚Äî multiplication
     () => { const a=rand(3,9),b=rand(4,12); return { question:`${a} rows with ${b} seats in each row. How many seats?`, answer:String(a*b), hint:"Multiplication word problem" }; },
-    // Word problem — division (fixed, no fallback bug)
+    // Word problem ‚Äî division (fixed, no fallback bug)
     () => { const groups=pick([3,4,5,6]),per=rand(3,8),total=groups*per; return { question:`${total} sweets shared equally among ${groups} children. How many each?`, answer:String(per), hint:"Division word problem" }; },
-    // Word problem — multi-step (money)
+    // Word problem ‚Äî multi-step (money)
     () => { const price=rand(3,12),qty=rand(2,5),budget=price*qty+rand(2,15); const change=budget-price*qty; return { question:`You buy ${qty} books at \u20ac${price} each. You pay with \u20ac${budget}. What change?`, answer:String(change), hint:"Find total cost, then subtract from what you paid" }; },
+    // Clock reading ‚Äî 5-minute intervals
+    () => { const h=rand(1,12),m=pick([0,5,10,15,20,25,30,35,40,45,50,55]); return { question:'What time is shown?', answer:formatClockAnswer(h,m), hint:"Read the hour hand first, then count the minutes in 5s", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
   ],
   4: [
     () => { const a=rand(12,35),b=rand(11,25); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Break it into parts: "+a+" \u00d7 "+Math.floor(b/10)*10+" and "+a+" \u00d7 "+(b%10) }; },
@@ -837,7 +843,7 @@ const TEDDY_SHAPES = {
   ]
 };
 
-// Jolly Phonics order — sounds first
+// Jolly Phonics order ‚Äî sounds first
 const TEDDY_LETTERS = {
   2: ['s','a','t','i','p','n'],
   3: ['s','a','t','i','p','n','c','k','e','h','r','m','d'],
@@ -925,17 +931,62 @@ function makeMultiplicationVisual(a, b) {
     '</div>';
 }
 
+// ===== CLOCK FACE VISUALS =====
+function makeClockFace(hour, minute) {
+  var h = hour % 12;
+  var mAngle = minute * 6;
+  var hAngle = h * 30 + minute * 0.5;
+  var mRad = (mAngle - 90) * Math.PI / 180;
+  var hRad = (hAngle - 90) * Math.PI / 180;
+  var mx = 50 + 35 * Math.cos(mRad), my = 50 + 35 * Math.sin(mRad);
+  var hx = 50 + 24 * Math.cos(hRad), hy = 50 + 24 * Math.sin(hRad);
+  var nums = '';
+  for (var i = 1; i <= 12; i++) {
+    var a = (i * 30 - 90) * Math.PI / 180;
+    var nx = 50 + 40 * Math.cos(a), ny = 50 + 40 * Math.sin(a);
+    nums += '<text x="'+nx+'" y="'+ny+'" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#334155">'+i+'</text>';
+  }
+  return '<svg viewBox="0 0 100 100" width="120" height="120" style="background:white;border-radius:50%;border:3px solid #334155">' +
+    '<circle cx="50" cy="50" r="48" fill="white"/>' + nums +
+    '<line x1="50" y1="50" x2="'+hx+'" y2="'+hy+'" stroke="#334155" stroke-width="4" stroke-linecap="round"/>' +
+    '<line x1="50" y1="50" x2="'+mx+'" y2="'+my+'" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<circle cx="50" cy="50" r="3" fill="#334155"/></svg>';
+}
+
+function formatClockAnswer(hour, minute) {
+  var h12 = hour % 12 || 12;
+  if (minute === 0) return h12 + " o'clock";
+  if (minute === 15) return 'quarter past ' + h12;
+  if (minute === 30) return 'half past ' + h12;
+  if (minute === 45) return 'quarter to ' + ((h12 % 12) + 1);
+  if (minute < 30) return minute + ' past ' + h12;
+  return (60 - minute) + ' to ' + ((h12 % 12) + 1);
+}
+
+function makeClockAlts(hour, minute) {
+  var h12 = hour % 12 || 12;
+  var alts = [];
+  var hh = String(h12), mm = String(minute).padStart(2, '0');
+  alts.push(hh + ':' + mm);
+  if (minute === 0) alts.push(h12 + " oclock", h12 + ":00");
+  if (minute === 15) alts.push('15 past ' + h12);
+  if (minute === 30) alts.push('30 past ' + h12);
+  if (minute === 45) { var next = (h12 % 12) + 1; alts.push('15 to ' + next, '45 past ' + h12); }
+  if (minute > 30 && minute !== 45) { var next = (h12 % 12) + 1; alts.push((60 - minute) + ' to ' + next); }
+  return alts;
+}
+
 const TEDDY_Q = {
   1: [
-    // Emoji counting 1-3 (keep — Teddy likes it)
+    // Emoji counting 1-3 (keep ‚Äî Teddy likes it)
     () => { const n=rand(1,3); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:`How many ${item.plural}?` }; },
     // Block tower counting 1-3
     () => { const n=rand(1,3); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'How many blocks?' }; },
     // Simple addition with towers: 1+1, 1+2, 2+1
     () => { const a=rand(1,2),b=rand(1,2); return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(a+b,1,4,4), answer: String(a+b), speak:`${a} plus ${b}?` }; },
-    // Colours (4 basic) — show coloured object, tap matching colour circle
+    // Colours (4 basic) ‚Äî show coloured object, tap matching colour circle
     () => { const colours=TEDDY_COLOURS[1]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: shuffleArray(emojis), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    // Shapes (3 basic) — show real-world shaped object, tap matching shape
+    // Shapes (3 basic) ‚Äî show real-world shaped object, tap matching shape
     () => { const shapes=TEDDY_SHAPES[1]; const s=pick(shapes); const allEmojis=[...shapes.map(x=>x.emoji), '\u2B1C']; const choices=makeDistractors(s.emoji, allEmojis, 4); return { prompt:'What shape is this?', visual: pick(s.objects), choices: choices, answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
     // Number recognition 1-3
     () => { const n=rand(1,3); const digits=['1\uFE0F\u20E3','2\uFE0F\u20E3','3\uFE0F\u20E3','4\uFE0F\u20E3']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'What number is this?' }; },
@@ -947,13 +998,13 @@ const TEDDY_Q = {
     () => { const n=rand(1,5); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:'How many blocks?' }; },
     // Addition with towers
     () => { const a=rand(1,4),b=rand(1,4); const s=a+b; return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(s,1,9,4), answer: String(s), speak:`${a} plus ${b}?` }; },
-    // Colours (7) — show coloured object, tap matching colour circle
+    // Colours (7) ‚Äî show coloured object, tap matching colour circle
     () => { const colours=TEDDY_COLOURS[2]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: makeDistractors(c.emoji, emojis, 4), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    // Shapes (6) — show real-world shaped object, tap matching shape
+    // Shapes (6) ‚Äî show real-world shaped object, tap matching shape
     () => { const shapes=TEDDY_SHAPES[2]; const s=pick(shapes); const emojis=shapes.map(x=>x.emoji); return { prompt:'What shape is this?', visual: pick(s.objects), choices: makeDistractors(s.emoji, emojis, 4), answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
     // Number recognition 1-5
     () => { const n=rand(1,5); const digits=['1\uFE0F\u20E3','2\uFE0F\u20E3','3\uFE0F\u20E3','4\uFE0F\u20E3','5\uFE0F\u20E3']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:'What number is this?' }; },
-    // Letters Group 1: s, a, t, i, p, n — phoneme recognition
+    // Letters Group 1: s, a, t, i, p, n ‚Äî phoneme recognition
     () => { const letters=TEDDY_LETTERS[2]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Which letter makes the "${PHONEMES[l]}" sound?`, visual: l.toUpperCase(), choices: choices, answer: l.toUpperCase(), speak:`Which letter makes the ${PHONEMES[l]} sound?` }; },
     () => { const letters=TEDDY_LETTERS[2]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Tap the letter: ${PHONEMES[l]}`, visual: '', choices: choices, answer: l.toUpperCase(), speak: PHONEMES[l] }; },
   ],
@@ -968,23 +1019,23 @@ const TEDDY_Q = {
     () => { const a=rand(2,3),b=rand(2,4); const p=a*b; return { prompt:`${a} times ${b}?`, visual: makeMultiplicationVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(p,2,12,4), answer: String(p), speak:`${a} times ${b}?` }; },
     // Number recognition 1-10
     () => { const n=rand(1,10); return { prompt:'What number is this?', visual: `<span style="font-size:4rem;font-weight:700">${n}</span>`, visualIsHTML: true, choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:'What number is this?' }; },
-    // Colours (full set) — show coloured object, tap matching colour circle
+    // Colours (full set) ‚Äî show coloured object, tap matching colour circle
     () => { const colours=TEDDY_COLOURS[3]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: makeDistractors(c.emoji, emojis, 4), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    // Shapes (full set) — show real-world shaped object, tap matching shape
+    // Shapes (full set) ‚Äî show real-world shaped object, tap matching shape
     () => { const shapes=TEDDY_SHAPES[3]; const s=pick(shapes); const emojis=shapes.map(x=>x.emoji); return { prompt:'What shape is this?', visual: pick(s.objects), choices: makeDistractors(s.emoji, emojis, 4), answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
     // Letters Group 2
     () => { const letters=TEDDY_LETTERS[3]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Which letter makes the "${PHONEMES[l]}" sound?`, visual: l.toUpperCase(), choices: choices, answer: l.toUpperCase(), speak:`Which letter makes the ${PHONEMES[l]} sound?` }; },
     () => { const letters=TEDDY_LETTERS[3]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Tap the letter: ${PHONEMES[l]}`, visual: '', choices: choices, answer: l.toUpperCase(), speak: PHONEMES[l] }; },
-    // More / Less — show both groups in visual area, tap the bigger number
+    // More / Less ‚Äî show both groups in visual area, tap the bigger number
     () => { const a=rand(1,4),b=rand(a+2,9); const itemA=pick(TEDDY_ITEMS),itemB=pick(TEDDY_ITEMS); const va=makeCountVisual(a,itemA.emoji), vb=makeCountVisual(b,itemB.emoji); const ordered=Math.random()<0.5?[itemA.emoji,itemB.emoji]:[itemB.emoji,itemA.emoji]; return { prompt:'Which group has MORE?', visual: va + '&nbsp; &nbsp;or&nbsp; &nbsp;' + vb, visualIsHTML: true, choices: ordered, answer: itemB.emoji, speak:'Which group has more?' }; },
   ]
 };
 
 // ===== TYPE TAGS (parallel to generator arrays) =====
 const MATHS_TAGS = {
-  1: ['add-1d','add-2d','add-2d','sub-2d','sub-2d','missing','times-2','times-5','pattern','word-add','word-mult'],
-  2: ['add-2d','sub-2d','times','times','division','word-add','word-sub','word-mult'],
-  3: ['add-mental','sub-mental','times','times','division','div-rem','pct','pct','fractions','word-mult','word-div','word-money'],
+  1: ['add-1d','add-2d','add-2d','sub-2d','sub-2d','missing','times-2','times-5','pattern','word-add','word-mult','clock'],
+  2: ['add-2d','sub-2d','times','times','division','word-add','word-sub','word-mult','clock'],
+  3: ['add-mental','sub-mental','times','times','division','div-rem','pct','pct','fractions','word-mult','word-div','word-money','clock'],
   4: ['long-mult','long-mult','long-div','frac-add','dec-add','dec-sub','pct','pct','pct','word-money','multi-step'],
   5: ['frac-add','frac-mult','dec-mult','pct','bimdas','bimdas','bimdas','word-money','word-rate']
 };
@@ -1053,7 +1104,7 @@ function selectWeighted(generators, tags, profile, level, lastTags, missedTypes)
     const s = stats[key];
     if (!s || (s.right + s.wrong) < 3) return 1.5; // exploration bonus
     var rate = s.right / (s.right + s.wrong);
-    // Inverse: struggling→high weight, strong→low weight
+    // Inverse: struggling‚Üíhigh weight, strong‚Üílow weight
     var w = 1 / (rate + 0.1);
     return Math.max(0.3, Math.min(3.0, w));
   });
@@ -1070,7 +1121,7 @@ function selectWeighted(generators, tags, profile, level, lastTags, missedTypes)
       if (lastTags.includes(tags[i])) weights[i] = 0;
       else if (w > 0) hasNonZero = true;
     });
-    if (!hasNonZero) { // all zeroed — re-enable all
+    if (!hasNonZero) { // all zeroed ‚Äî re-enable all
       generators.forEach(function(g, i) {
         var tag = tags[i], key = level + ':' + tag;
         var s = stats[key];
