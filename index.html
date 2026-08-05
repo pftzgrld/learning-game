@@ -179,6 +179,18 @@
 
   .action-row { display: flex; gap: 12px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
 
+  .helper-keys { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+  .key-btn {
+    width: 54px; height: 48px; border-radius: 12px; border: 1px solid var(--line);
+    background: var(--surface-2); color: var(--ink); font-size: 1.3rem; font-weight: 700;
+    cursor: pointer; font-family: inherit; box-shadow: var(--shadow); transition: .12s;
+  }
+  .key-btn:hover { border-color: var(--accent); background: var(--chip-bg); }
+  .pencil-note {
+    display: inline-block; margin-top: 12px; background: var(--warn-bg); color: var(--warn);
+    border-radius: 999px; padding: 6px 16px; font-size: 0.85rem; font-weight: 600;
+  }
+
   .feedback { margin-top: 18px; font-size: 1.2rem; font-weight: 700; min-height: 36px; }
   .feedback.correct-fb { color: var(--ok); }
   .feedback.wrong-fb { color: var(--crit); }
@@ -376,6 +388,8 @@
       <button class="btn btn-hear" id="btn-hear" onclick="hearWord()" title="Hear the word again">🔊</button>
       <input type="text" id="game-input" class="game-input" placeholder="Type your answer..." autocomplete="off" autocapitalize="none" spellcheck="false">
     </div>
+    <div class="helper-keys" id="helper-keys" style="display:none"></div>
+    <div class="pencil-note" id="pencil-note" style="display:none">✏️ Pen and paper allowed — take your time!</div>
     <div class="action-row">
       <button class="btn btn-primary" id="btn-check" onclick="checkAnswer()">Check ✓</button>
     </div>
@@ -799,14 +813,14 @@ const TOPICS = [
 
   // ---------- BAND 4 ----------
   { id:'long-mult', band:4, name:'Long multiplication', emoji:'✖️', fam:'written', prereqs:['times-12','mental-3'], enc:{'times-12':1,'mental-3':0.5}, gens:[
-    () => { const a=rand(12,35),b=rand(11,25); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Break it into parts: "+a+" × "+Math.floor(b/10)*10+" and "+a+" × "+(b%10) }; },
-    () => { const a=rand(15,50),b=rand(12,20); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Long multiplication" }; },
+    () => { const a=rand(13,89),b=rand(3,9); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Multiply the units first, then the tens" }; },
+    () => { const a=rand(112,489),b=rand(3,6); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Units, then tens, then hundreds" }; },
   ]},
   { id:'long-div', band:4, name:'Long division', emoji:'➗', fam:'written', prereqs:['division-3','times-12'], enc:{'division-3':1,'times-12':0.5}, gens:[
-    () => { const d=rand(4,12),q=rand(10,25),p=d*q; return { question:`${p} ÷ ${d} = ?`, answer:String(q), hint:"Long division" }; },
+    () => { const d=rand(3,9),q=rand(12,25),p=d*q; return { question:`${p} ÷ ${d} = ?`, answer:String(q), hint:"How many "+d+"s? Work through it digit by digit" }; },
   ]},
   { id:'frac-add-same', band:4, name:'Adding fractions', emoji:'🍕', fam:'mental', prereqs:['fractions-of'], enc:{'fractions-of':0.5}, gens:[
-    () => { const d=pick([4,5,6,8]),a=rand(1,d-2),b=rand(1,d-a-1); return { question:`${a}/${d} + ${b}/${d} = ?`, answer:(a+b)+"/"+d, hint:"Add the tops, keep the bottom", acceptAlt:[String(((a+b)/d).toFixed(4).replace(/\.?0+$/,''))] }; },
+    () => { const d=pick([4,5,6,8]),a=rand(1,d-2),b=rand(1,d-a-1); const n=a+b,g=gcd(n,d); return { question:`${a}/${d} + ${b}/${d} = ?`, answer:n+"/"+d, hint:"Add the tops, keep the bottom", acceptAlt:[(n/g)+"/"+(d/g), String((n/d).toFixed(4).replace(/\.?0+$/,''))] }; },
   ]},
   { id:'decimals-add', band:4, name:'Decimals', emoji:'🔢', fam:'mental', prereqs:['mental-3','place-value'], enc:{'mental-3':0.5,'place-value':0.3}, gens:[
     () => { const a=(rand(10,90)/10),b=(rand(10,90)/10); const s=Math.round((a+b)*10)/10; return { question:`${a.toFixed(1)} + ${b.toFixed(1)} = ?`, answer:String(s), hint:"Add the decimals" }; },
@@ -828,11 +842,15 @@ const TOPICS = [
   ]},
 
   // ---------- BAND 5 ----------
+  { id:'long-mult-2', band:5, name:'Long multiplication (big)', emoji:'✖️', fam:'written', prereqs:['long-mult'], enc:{'long-mult':1,'times-12':0.5}, gens:[
+    () => { const a=rand(12,35),b=rand(11,25); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Break it into parts: "+a+" × "+Math.floor(b/10)*10+" and "+a+" × "+(b%10) }; },
+    () => { const a=rand(15,50),b=rand(12,20); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Two rows: × units, × tens, then add them" }; },
+  ]},
   { id:'frac-add-diff', band:5, name:'Fractions (mixed bottoms)', emoji:'🍕', fam:'mental', prereqs:['frac-add-same','times-12'], enc:{'frac-add-same':1,'times-12':0.5}, gens:[
-    () => { const pairs=[[2,3],[3,4],[2,5],[3,5],[4,5],[2,7],[3,8]]; const [d1,d2]=pick(pairs); const a=rand(1,d1-1),b=rand(1,d2-1); const lcd=d1*d2; const num=a*d2+b*d1; const g=gcd(num,lcd); return { question:`${a}/${d1} + ${b}/${d2} = ?`, answer:(num/g)+"/"+(lcd/g), hint:"Find a common denominator: "+(lcd), acceptAlt:[String((num/lcd).toFixed(4).replace(/\.?0+$/,''))] }; },
+    () => { const pairs=[[2,3],[3,4],[2,5],[3,5],[4,5],[2,7],[3,8]]; const [d1,d2]=pick(pairs); const a=rand(1,d1-1),b=rand(1,d2-1); const lcd=d1*d2; const num=a*d2+b*d1; const g=gcd(num,lcd); return { question:`${a}/${d1} + ${b}/${d2} = ?`, answer:(num/g)+"/"+(lcd/g), hint:"Find a common denominator: "+(lcd), acceptAlt:[num+"/"+lcd, String((num/lcd).toFixed(4).replace(/\.?0+$/,''))] }; },
   ]},
   { id:'frac-mult', band:5, name:'Multiplying fractions', emoji:'🍕', fam:'mental', prereqs:['frac-add-same'], enc:{'frac-add-same':0.5,'times-12':0.5}, gens:[
-    () => { const a=rand(1,5),b=rand(2,6),c=rand(1,5),d=rand(2,6); const num=a*c,den=b*d; const g=gcd(num,den); return { question:`${a}/${b} × ${c}/${d} = ?`, answer:(num/g)+"/"+(den/g), hint:"Multiply tops, multiply bottoms, then simplify", acceptAlt:[String((num/den).toFixed(4).replace(/\.?0+$/,''))] }; },
+    () => { const a=rand(1,5),b=rand(2,6),c=rand(1,5),d=rand(2,6); const num=a*c,den=b*d; const g=gcd(num,den); return { question:`${a}/${b} × ${c}/${d} = ?`, answer:(num/g)+"/"+(den/g), hint:"Multiply tops, multiply bottoms, then simplify", acceptAlt:[num+"/"+den, String((num/den).toFixed(4).replace(/\.?0+$/,''))] }; },
   ]},
   { id:'dec-mult', band:5, name:'Multiplying decimals', emoji:'🔢', fam:'written', prereqs:['decimals-add','long-mult'], enc:{'long-mult':0.5,'decimals-add':0.5}, gens:[
     () => { const a=rand(11,35)/10,b=rand(11,25)/10; const r=Math.round(a*b*100)/100; return { question:`${a.toFixed(1)} × ${b.toFixed(1)} = ?`, answer:String(r), hint:"Multiply, then place the decimal point" }; },
@@ -1343,6 +1361,8 @@ function nextQuestion() {
     currentQuestion = { word: picked.word, hint: picked.hint, answer: picked.word.toLowerCase() };
     lastWord = picked.word;
     setTopicChip();
+    renderHelperKeys([]);
+    document.getElementById('pencil-note').style.display = 'none';
     input.inputMode = 'text';
     document.getElementById('hint-text').innerHTML = picked.hint;
     setTimeout(() => hearWord(), 400);
@@ -1355,6 +1375,15 @@ function nextQuestion() {
     if (lastTopics.length > 2) lastTopics.shift();
     currentQuestion = pick(currentTopic.gens)();
     input.inputMode = /^[0-9.]+$/.test(String(currentQuestion.answer)) ? 'decimal' : 'text';
+    // tap-keys for characters kids can't easily find on the keyboard
+    const answers = [String(currentQuestion.answer)].concat((currentQuestion.acceptAlt || []).map(String));
+    const keys = [];
+    if (answers.some(a => a.includes('/'))) keys.push('/');
+    if (answers.some(a => a.includes(':'))) keys.push(':');
+    if (answers.some(a => / r /.test(a))) keys.push('r');
+    if (input.inputMode === 'text' && answers.some(a => a.includes('.')) && !keys.length) keys.push('.');
+    renderHelperKeys(keys);
+    document.getElementById('pencil-note').style.display = currentTopic.fam === 'written' ? 'inline-block' : 'none';
     document.getElementById('question-text').textContent = currentQuestion.question;
     document.getElementById('hint-text').textContent = currentQuestion.hint;
     const vizEl = document.getElementById('question-visual');
@@ -1363,6 +1392,25 @@ function nextQuestion() {
   }
   qStart = Date.now();
   input.focus();
+}
+
+function renderHelperKeys(keys) {
+  const el = document.getElementById('helper-keys');
+  if (!keys.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.innerHTML = '';
+  keys.forEach(k => {
+    const btn = document.createElement('button');
+    btn.className = 'key-btn';
+    btn.textContent = k === 'r' ? 'r' : k;
+    btn.onclick = () => {
+      if (waiting) return;
+      const input = document.getElementById('game-input');
+      input.value += (k === 'r' ? ' r ' : k);
+      input.focus();
+    };
+    el.appendChild(btn);
+  });
+  el.style.display = 'flex';
 }
 
 function getIrishVoice() {
