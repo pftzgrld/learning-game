@@ -1478,20 +1478,39 @@ function renderHelperKeys(keys) {
   el.style.display = 'flex';
 }
 
-function getIrishVoice() {
+// Voice quality varies wildly per device. Prefer the high-quality voices
+// (Enhanced/Premium/Natural/Siri) when installed; a per-device override can
+// be set in the parent view (stored in localStorage, not per child).
+function scoreVoice(v) {
+  const n = v.name.toLowerCase();
+  let s = 0;
+  if (/siri/.test(n)) s += 50;
+  if (/enhanced|premium|natural|neural/.test(n)) s += 40;
+  if (v.lang === 'en-IE' || v.lang.startsWith('en-IE')) s += 30;
+  else if (v.lang.startsWith('en-GB')) s += 20;
+  else if (v.lang.startsWith('en')) s += 10;
+  if (/compact|espeak|novelty|bad news|good news|bells|boing|bubbles|cellos|jester|organ|trinoids|whisper|wobble|zarvox|albert|fred|junior|kathy|ralph/.test(n)) s -= 60;
+  return s;
+}
+
+function getBestVoice() {
   const voices = window.speechSynthesis.getVoices();
-  return voices.find(v => v.lang === 'en-IE')
-    || voices.find(v => v.lang.startsWith('en-IE'))
-    || voices.find(v => v.name.toLowerCase().includes('moira'))
-    || voices.find(v => v.lang.startsWith('en-GB'))
-    || voices.find(v => v.lang.startsWith('en'));
+  if (!voices.length) return null;
+  const pref = localStorage.getItem('lc_voice');
+  if (pref) {
+    const chosen = voices.find(v => v.name === pref);
+    if (chosen) return chosen;
+  }
+  const en = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
+  const pool = en.length ? en : voices;
+  return pool.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0];
 }
 
 function speakText(text, rate) {
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
   utter.rate = rate || 0.9;
-  const voice = getIrishVoice();
+  const voice = getBestVoice();
   if (voice) utter.voice = voice;
   window.speechSynthesis.speak(utter);
 }
@@ -1998,9 +2017,39 @@ function renderKid(name) {
   return html;
 }
 
+function renderVoicePicker() {
+  const voices = window.speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'));
+  const current = getBestVoice();
+  let html = '<div class="kid-card"><h3>🔊 Voice <span class="chip">this device</span></h3>';
+  if (!voices.length) {
+    html += '<div class="trouble">No voices loaded yet — reopen this screen in a moment.</div></div>';
+    return html;
+  }
+  html += '<div class="chips" style="align-items:center">';
+  html += '<select id="voice-select" style="font-family:inherit;font-size:14px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);max-width:260px">';
+  voices.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a)).forEach(v => {
+    const sel = current && v.name === current.name ? ' selected' : '';
+    html += '<option value="' + v.name.replace(/"/g, '&quot;') + '"' + sel + '>' + v.name + ' (' + v.lang + ')</option>';
+  });
+  html += '</select>';
+  html += '<button class="btn" style="padding:8px 18px;font-size:14px" onclick="testVoice()">▶️ Test</button>';
+  html += '</div>';
+  html += '<div class="trouble">Better voices are a free download: on iPad/iPhone go to <b>Settings → Accessibility → Spoken Content → Voices → English</b> and download an Enhanced or Premium voice (e.g. Moira Enhanced — Irish). It appears here once installed.</div>';
+  html += '</div>';
+  return html;
+}
+
+function testVoice() {
+  const sel = document.getElementById('voice-select');
+  if (sel) localStorage.setItem('lc_voice', sel.value);
+  speakText('Well done! Three times seven is twenty one. Brilliant!', 0.95);
+}
+
 function showParent() {
-  document.getElementById('parent-content').innerHTML = renderKid('elsie') + renderKid('freya') + renderKid('teddy');
+  document.getElementById('parent-content').innerHTML = renderVoicePicker() + renderKid('elsie') + renderKid('freya') + renderKid('teddy');
   showScreen('screen-parent');
+  const sel = document.getElementById('voice-select');
+  if (sel) sel.addEventListener('change', () => localStorage.setItem('lc_voice', sel.value));
 }
 
 // =====================================================================
