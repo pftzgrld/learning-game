@@ -623,6 +623,23 @@ function makeNumberDistractors(correct, min, max, count) {
   return shuffleArray(options.map(String));
 }
 
+// Drawn shapes for Teddy's shape-answer buttons — emoji can't show a rectangle
+// (⬜ is a square), so the buttons draw the real shape instead.
+function shapeSVG(emoji) {
+  const shapes = {
+    '⭕': '<circle cx="30" cy="20" r="16" fill="#4285f4"/>',
+    '🟥': '<rect x="14" y="4" width="32" height="32" rx="3" fill="#ea4335"/>',
+    '⬜': '<rect x="4" y="11" width="52" height="18" rx="3" fill="#34a853"/>',
+    '🔺': '<polygon points="30,4 48,36 12,36" fill="#9334e6"/>',
+    '⭐': '<polygon points="30,4 34.2,14.9 45.9,15.5 36.9,23 39.9,34.3 30,28 20.1,34.3 23.1,23 14.1,15.5 25.8,14.9" fill="#f9ab00"/>',
+    '❤️': '<path d="M30,36 C10,23 16,5 30,13 C44,5 50,23 30,36 Z" fill="#e8455f"/>',
+    '🔷': '<polygon points="30,3 46,20 30,37 14,20" fill="#12b5cb"/>'
+  };
+  const inner = shapes[emoji];
+  if (!inner) return null;
+  return '<svg viewBox="0 0 60 40" width="66" height="44" style="display:block">' + inner + '</svg>';
+}
+
 function makeCountVisual(count, emoji) {
   if (count <= 5) return (emoji + ' ').repeat(count).trim();
   return (emoji + ' ').repeat(5).trim() + '  ' + (emoji + ' ').repeat(count - 5).trim();
@@ -758,7 +775,7 @@ const TOPICS = [
     () => { const t=pick([2,3,4,5,10]),b=rand(2,10),p=t*b; return { question:`${p} ÷ ${t} = ?`, answer:String(b), hint:"How many "+t+"s in "+p+"?" }; },
   ]},
   { id:'place-value', band:2, name:'Place value', emoji:'🔟', fam:'mental', prereqs:['add-sub-2'], enc:{}, gens:[
-    () => { const h=rand(1,9); let t=rand(1,9); while(t===h) t=rand(1,9); let u=rand(1,9); while(u===h||u===t) u=rand(1,9); const n=h*100+t*10+u; const which=pick(['h','t','u']); const digit=which==='h'?h:which==='t'?t:u; const val=which==='h'?h*100:which==='t'?t*10:u; return { question:`In ${n}, what is the ${digit} worth?`, answer:String(val), hint:"Is it in the hundreds, tens or units place?" }; },
+    () => { const h=rand(1,9); let t=rand(1,9); while(t===h) t=rand(1,9); let u=rand(1,9); while(u===h||u===t) u=rand(1,9); const n=h*100+t*10+u; const which=pick(['h','t','u']); const digit=which==='h'?h:which==='t'?t:u; const val=which==='h'?h*100:which==='t'?t*10:u; return { question:`In ${n}, what is the ${digit} worth?`, answer:String(val), hint:"Find its place, then type its value as a number — like 300, 40 or 2" }; },
     () => { const h=rand(1,9),t=rand(0,9),u=rand(0,9); const n=h*100+t*10+u; return { question:`What is the tens digit of ${n}?`, answer:String(t), hint:"Hundreds, then tens, then units" }; },
   ]},
   { id:'money-total', band:2, name:'Money', emoji:'💶', fam:'word', prereqs:['add-sub-2'], enc:{'add-sub-2':0.7}, gens:[
@@ -964,7 +981,7 @@ const TEDDY_Q = {
     () => { const n=rand(1,3); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'How many blocks?' }; },
     () => { const a=rand(1,2),b=rand(1,2); return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(a+b,1,4,4), answer: String(a+b), speak:`${a} plus ${b}?` }; },
     () => { const colours=TEDDY_COLOURS[1]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: shuffleArray(emojis), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    () => { const shapes=TEDDY_SHAPES[1]; const s=pick(shapes); const allEmojis=[...shapes.map(x=>x.emoji), '⬜']; const choices=makeDistractors(s.emoji, allEmojis, 4); return { prompt:'What shape is this?', visual: pick(s.objects), choices: choices, answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
+    () => { const shapes=TEDDY_SHAPES[1]; const s=pick(shapes); const allEmojis=[...shapes.map(x=>x.emoji), '⬜']; const choices=makeDistractors(s.emoji, allEmojis, 4); return { prompt:'What shape is this?', visual: pick(s.objects), choices: choices, answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?', isShape: true }; },
     () => { const n=rand(1,3); const digits=['1️⃣','2️⃣','3️⃣','4️⃣']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'What number is this?' }; },
   ],
   2: [
@@ -972,7 +989,7 @@ const TEDDY_Q = {
     () => { const n=rand(1,5); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:'How many blocks?' }; },
     () => { const a=rand(1,4),b=rand(1,4); const s=a+b; return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(s,1,9,4), answer: String(s), speak:`${a} plus ${b}?` }; },
     () => { const colours=TEDDY_COLOURS[2]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: makeDistractors(c.emoji, emojis, 4), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    () => { const shapes=TEDDY_SHAPES[2]; const s=pick(shapes); const emojis=shapes.map(x=>x.emoji); return { prompt:'What shape is this?', visual: pick(s.objects), choices: makeDistractors(s.emoji, emojis, 4), answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
+    () => { const shapes=TEDDY_SHAPES[2]; const s=pick(shapes); const emojis=shapes.map(x=>x.emoji); return { prompt:'What shape is this?', visual: pick(s.objects), choices: makeDistractors(s.emoji, emojis, 4), answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?', isShape: true }; },
     () => { const n=rand(1,5); const digits=['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:'What number is this?' }; },
     () => { const letters=TEDDY_LETTERS[2]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Which letter makes the "${PHONEMES[l]}" sound?`, visual: l.toUpperCase(), choices: choices, answer: l.toUpperCase(), speak:`Which letter makes the ${PHONEMES[l]} sound?` }; },
     () => { const letters=TEDDY_LETTERS[2]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Tap the letter: ${PHONEMES[l]}`, visual: '', choices: choices, answer: l.toUpperCase(), speak: PHONEMES[l] }; },
@@ -984,7 +1001,7 @@ const TEDDY_Q = {
     () => { const a=rand(2,3),b=rand(2,4); const p=a*b; return { prompt:`${a} times ${b}?`, visual: makeMultiplicationVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(p,2,12,4), answer: String(p), speak:`${a} times ${b}?` }; },
     () => { const n=rand(1,10); return { prompt:'What number is this?', visual: `<span style="font-size:4rem;font-weight:700">${n}</span>`, visualIsHTML: true, choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:'What number is this?' }; },
     () => { const colours=TEDDY_COLOURS[3]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: makeDistractors(c.emoji, emojis, 4), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    () => { const shapes=TEDDY_SHAPES[3]; const s=pick(shapes); const emojis=shapes.map(x=>x.emoji); return { prompt:'What shape is this?', visual: pick(s.objects), choices: makeDistractors(s.emoji, emojis, 4), answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
+    () => { const shapes=TEDDY_SHAPES[3]; const s=pick(shapes); const emojis=shapes.map(x=>x.emoji); return { prompt:'What shape is this?', visual: pick(s.objects), choices: makeDistractors(s.emoji, emojis, 4), answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?', isShape: true }; },
     () => { const letters=TEDDY_LETTERS[3]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Which letter makes the "${PHONEMES[l]}" sound?`, visual: l.toUpperCase(), choices: choices, answer: l.toUpperCase(), speak:`Which letter makes the ${PHONEMES[l]} sound?` }; },
     () => { const letters=TEDDY_LETTERS[3]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Tap the letter: ${PHONEMES[l]}`, visual: '', choices: choices, answer: l.toUpperCase(), speak: PHONEMES[l] }; },
     () => { const a=rand(1,4),b=rand(a+2,9); const itemA=pick(TEDDY_ITEMS),itemB=pick(TEDDY_ITEMS); const va=makeCountVisual(a,itemA.emoji), vb=makeCountVisual(b,itemB.emoji); const ordered=Math.random()<0.5?[itemA.emoji,itemB.emoji]:[itemB.emoji,itemA.emoji]; return { prompt:'Which group has MORE?', visual: va + '&nbsp; &nbsp;or&nbsp; &nbsp;' + vb, visualIsHTML: true, choices: ordered, answer: itemB.emoji, speak:'Which group has more?' }; },
@@ -1630,7 +1647,9 @@ function nextTeddyQuestion() {
   currentQuestion.choices.forEach((choice) => {
     const btn = document.createElement('button');
     btn.className = 'teddy-choice';
-    btn.textContent = choice;
+    btn.dataset.choice = choice;
+    const drawn = currentQuestion.isShape ? shapeSVG(choice) : null;
+    if (drawn) btn.innerHTML = drawn; else btn.textContent = choice;
     btn.onclick = () => checkTeddyAnswer(choice, btn);
     choicesEl.appendChild(btn);
   });
@@ -1671,7 +1690,7 @@ function checkTeddyAnswer(chosen, btnEl) {
     const spokenAnswer = currentQuestion.speakAnswer || currentQuestion.answer;
     feedbackEl.textContent = "Nearly! It's " + spokenAnswer;
     feedbackEl.className = 'teddy-feedback wrong-fb';
-    allBtns.forEach(b => { if (b.textContent === currentQuestion.answer) b.classList.add('correct-choice'); });
+    allBtns.forEach(b => { if (b.dataset.choice === currentQuestion.answer) b.classList.add('correct-choice'); });
     p.streak = 0;
     recordAnswer(p, false);
     recordTypeResult(p, p.level, currentQuestion._tag, false);
