@@ -302,7 +302,12 @@
   .keyboard-open .game-card { padding: 14px 12px; }
   .keyboard-open .hint-text { font-size: 0.85rem; margin-bottom: 8px; min-height: unset; }
   .keyboard-open .question-text { font-size: 1.2rem; min-height: unset; margin-bottom: 4px; }
-  .keyboard-open .question-visual { display: none; }
+  /* keep the visual (kids need the clock face while typing) — just shrink it */
+  .keyboard-open .question-visual { margin: 2px 0; }
+  .keyboard-open .question-visual svg { width: 90px; height: 90px; }
+  .keyboard-open .helper-keys { margin-top: 6px; }
+  .keyboard-open .helper-keys .key-btn { height: 40px; width: 48px; }
+  .keyboard-open .pencil-note { display: none !important; }
   .keyboard-open .feedback { min-height: unset; margin-top: 6px; font-size: 0.95rem; }
   .keyboard-open .correct-answer { font-size: 1.1rem; margin-top: 4px; }
   .keyboard-open .action-row { margin-top: 8px; }
@@ -753,7 +758,7 @@ const TOPICS = [
     () => { const t=pick([2,3,4,5,10]),b=rand(2,10),p=t*b; return { question:`${p} ÷ ${t} = ?`, answer:String(b), hint:"How many "+t+"s in "+p+"?" }; },
   ]},
   { id:'place-value', band:2, name:'Place value', emoji:'🔟', fam:'mental', prereqs:['add-sub-2'], enc:{}, gens:[
-    () => { const h=rand(1,9),t=rand(1,9),u=rand(1,9); const n=h*100+t*10+u; const which=pick(['h','t','u']); const digit=which==='h'?h:which==='t'?t:u; const val=which==='h'?h*100:which==='t'?t*10:u; return { question:`In ${n}, what is the ${digit} worth?`, answer:String(val), hint:"Is it in the hundreds, tens or units place?" }; },
+    () => { const h=rand(1,9); let t=rand(1,9); while(t===h) t=rand(1,9); let u=rand(1,9); while(u===h||u===t) u=rand(1,9); const n=h*100+t*10+u; const which=pick(['h','t','u']); const digit=which==='h'?h:which==='t'?t:u; const val=which==='h'?h*100:which==='t'?t*10:u; return { question:`In ${n}, what is the ${digit} worth?`, answer:String(val), hint:"Is it in the hundreds, tens or units place?" }; },
     () => { const h=rand(1,9),t=rand(0,9),u=rand(0,9); const n=h*100+t*10+u; return { question:`What is the tens digit of ${n}?`, answer:String(t), hint:"Hundreds, then tens, then units" }; },
   ]},
   { id:'money-total', band:2, name:'Money', emoji:'💶', fam:'word', prereqs:['add-sub-2'], enc:{'add-sub-2':0.7}, gens:[
@@ -902,7 +907,7 @@ const TEDDY_COLOURS = {
     { emoji: '🟢', name: 'Green', objects: ['🌲','🐸','🥦','🍀'] },
     { emoji: '🟡', name: 'Yellow', objects: ['🌟','🌻','🍌','🐤'] },
     { emoji: '🟠', name: 'Orange', objects: ['🍊','🦊','🎃','🥕'] },
-    { emoji: '🟣', name: 'Purple', objects: ['🍇','🍆','🧞','🪄'] },
+    { emoji: '🟣', name: 'Purple', objects: ['🍇','🍆','🔮','👾'] },
     { emoji: '🟤', name: 'Brown', objects: ['🐻','🌰','🥥','🏈'] },
   ],
   3: [
@@ -911,35 +916,35 @@ const TEDDY_COLOURS = {
     { emoji: '🟢', name: 'Green', objects: ['🌲','🐸','🥦','🍀'] },
     { emoji: '🟡', name: 'Yellow', objects: ['🌟','🌻','🍌','🐤'] },
     { emoji: '🟠', name: 'Orange', objects: ['🍊','🦊','🎃','🥕'] },
-    { emoji: '🟣', name: 'Purple', objects: ['🍇','🍆','🧞','🪄'] },
+    { emoji: '🟣', name: 'Purple', objects: ['🍇','🍆','🔮','👾'] },
     { emoji: '🟤', name: 'Brown', objects: ['🐻','🌰','🥥','🏈'] },
     { emoji: '⚫', name: 'Black', objects: ['🖤','🌑','🐈‍⬛','♟️'] },
-    { emoji: '⚪', name: 'White', objects: ['❄️','☁️','🦎','🦬'] },
+    { emoji: '⚪', name: 'White', objects: ['❄️','☁️','🕊️','⛄'] },
   ]
 };
 
 const TEDDY_SHAPES = {
   1: [
-    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍕'] },
+    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍩'] },
     { emoji: '🟥', name: 'Square', objects: ['📺','🧱','🖼️','🎬'] },
     { emoji: '🔺', name: 'Triangle', objects: ['🍕','⛺','🏴‍☠️','🎄'] },
   ],
   2: [
-    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍕'] },
+    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍩'] },
     { emoji: '🟥', name: 'Square', objects: ['📺','🧱','🖼️','🎬'] },
     { emoji: '🔺', name: 'Triangle', objects: ['⛺','🎄','🚩','🔔'] },
     { emoji: '⬜', name: 'Rectangle', objects: ['📱','📦','🚪','📋'] },
-    { emoji: '⭐', name: 'Star', objects: ['🌟','⭐','🌠','🪅'] },
-    { emoji: '❤️', name: 'Heart', objects: ['💕','💘','🌈','🩷'] },
+    { emoji: '⭐', name: 'Star', objects: ['🌟','⭐','🌠','✨'] },
+    { emoji: '❤️', name: 'Heart', objects: ['💕','💘','💗','🩷'] },
   ],
   3: [
-    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍕'] },
+    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍩'] },
     { emoji: '🟥', name: 'Square', objects: ['📺','🧱','🖼️','🎬'] },
     { emoji: '🔺', name: 'Triangle', objects: ['⛺','🎄','🚩','🔔'] },
     { emoji: '⬜', name: 'Rectangle', objects: ['📱','📦','🚪','📋'] },
-    { emoji: '⭐', name: 'Star', objects: ['🌟','⭐','🌠','🪅'] },
-    { emoji: '❤️', name: 'Heart', objects: ['💕','💘','🌈','🩷'] },
-    { emoji: '🔷', name: 'Diamond', objects: ['💎','♦️','🃏','🪁'] },
+    { emoji: '⭐', name: 'Star', objects: ['🌟','⭐','🌠','✨'] },
+    { emoji: '❤️', name: 'Heart', objects: ['💕','💘','💗','🩷'] },
+    { emoji: '🔷', name: 'Diamond', objects: ['💎','♦️','🔶','🪁'] },
   ]
 };
 
@@ -1391,7 +1396,9 @@ function nextQuestion() {
     else { vizEl.style.display = 'none'; vizEl.innerHTML = ''; }
   }
   qStart = Date.now();
-  input.focus();
+  // keep the whole question (and clock face) visible: don't let focus scroll the page
+  input.focus({ preventScroll: true });
+  window.scrollTo(0, 0);
 }
 
 function renderHelperKeys(keys) {
@@ -1406,7 +1413,7 @@ function renderHelperKeys(keys) {
       if (waiting) return;
       const input = document.getElementById('game-input');
       input.value += (k === 'r' ? ' r ' : k);
-      input.focus();
+      input.focus({ preventScroll: true });
     };
     el.appendChild(btn);
   });
