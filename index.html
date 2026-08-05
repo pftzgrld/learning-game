@@ -84,6 +84,20 @@
   .av-teddy { background: var(--warn-bg); }
   .av-spelling { background: var(--chip-bg); }
   .av-maths { background: var(--warn-bg); }
+  .av-drill { background: var(--crit-bg); }
+
+  .timer-track { height: 8px; background: var(--line); border-radius: 999px; margin-bottom: 16px; overflow: hidden; }
+  .timer-bar { height: 100%; width: 100%; background: var(--accent); border-radius: 999px; transition: width 1s linear, background .3s; }
+  .timer-bar.low { background: var(--g-red); }
+  #drill-question { font-size: 2.6rem; margin-bottom: 18px; }
+  #drill-input { max-width: 200px; font-size: 1.8rem; font-weight: 700; }
+  #drill-input.flash-ok { border-color: var(--g-green); background: var(--ok-bg); }
+  #drill-input.flash-no { border-color: var(--g-red); background: var(--crit-bg); }
+  .drill-results { text-align: center; }
+  .drill-results .big-score { font-size: 3.2rem; font-weight: 700; margin: 6px 0; }
+  .drill-results .rec { color: var(--warn); font-weight: 700; margin-bottom: 8px; }
+  .drill-results .watch { font-size: 0.95rem; color: var(--muted); margin: 10px 0 16px; }
+  .drill-results .watch b { color: var(--crit); }
 
   .profile-name, .mode-name { font-size: 1.25rem; font-weight: 700; }
   .profile-info, .mode-info { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
@@ -361,6 +375,33 @@
       <div class="mode-name">Maths</div>
       <div class="mode-info" id="maths-level-info"></div>
     </button>
+    <button class="mode-btn" onclick="startDrill()">
+      <div class="mode-icon av-drill">⚡</div>
+      <div class="mode-name">Tables Sprint</div>
+      <div class="mode-info" id="drill-level-info"></div>
+    </button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: TABLES SPRINT ===== -->
+<div class="screen" id="screen-drill">
+  <div class="topbar">
+    <div class="left">
+      <button class="nav-pill" onclick="endDrill(true)">←</button>
+      <div class="who-chip"><div class="avatar-sm" id="drill-avatar"></div><span id="drill-name-tag"></span></div>
+    </div>
+    <div class="right">
+      <div class="streak-chip" id="drill-score-chip">⚡ 0</div>
+      <div class="streak-chip" id="drill-time-chip">⏱ 60</div>
+    </div>
+  </div>
+  <div class="timer-track"><div class="timer-bar" id="timer-bar"></div></div>
+  <div class="game-card" id="drill-card">
+    <div class="question-text" id="drill-question"></div>
+    <div class="input-row">
+      <input type="text" id="drill-input" class="game-input" inputmode="numeric" placeholder="?" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="feedback" id="drill-feedback"></div>
   </div>
 </div>
 
@@ -1307,6 +1348,8 @@ function selectPlayer(name) {
   const wordsSolid = Object.keys(profile.spelling.words).filter(w => profile.spelling.words[w].s >= 3).length;
   document.getElementById('spelling-level-info').textContent = '📚 Band ' + profile.spelling.band + ' · ' + wordsSolid + ' words solid';
   document.getElementById('maths-level-info').textContent = '🏆 ' + mastered + '/' + TOPICS.length + ' topics mastered';
+  const dr = drillState(profile);
+  document.getElementById('drill-level-info').textContent = '✖️ ' + dr.tables.slice().sort((a,b)=>a-b).join(', ') + ' · Best ' + dr.best;
   document.getElementById('mode-daily').innerHTML = '<div class="streak-chip">🔥 ' + (profile.daily.streak||0) + ' · ⭐ ' + profile.daily.pts + '/' + (GOALS[name]||30) + '</div>';
   showScreen('screen-mode');
 }
@@ -1527,6 +1570,188 @@ function checkAnswer() {
   document.getElementById('btn-check').textContent = 'Next →';
   document.getElementById('btn-check').onclick = () => nextQuestion();
   input.disabled = true;
+}
+
+// =====================================================================
+// TABLES SPRINT — 60s automaticity drill on individual facts
+// Per-fact stats, weak/slow facts served more, tables unlock in the
+// standard order as the active set becomes fluent.
+// =====================================================================
+const TABLE_ORDER = [2, 5, 10, 3, 4, 6, 7, 8, 9, 11, 12];
+const SPRINT_SECS = 60;
+const FACT_FLUENT_MS = 6000;
+
+let drillTimer = null, drillTimeLeft = 0, drillScore = 0, drillQStart = 0;
+let drillFact = null, drillLastKey = null, drillBusy = false, drillActive = false;
+let sprintSeen = [];
+
+function drillState(p) {
+  if (!p.drill) p.drill = { facts:{}, tables: (p.name === 'elsie' ? [2,5,10,3,4] : [2,5,10]), best:0, sprints:0 };
+  return p.drill;
+}
+
+function factKey(a, b) { return Math.min(a,b) + 'x' + Math.max(a,b); }
+
+function drillMaxB(d) { return d.tables.length > 5 ? 12 : 10; }
+
+function allFactPairs(d) {
+  const pairs = [];
+  const maxB = drillMaxB(d);
+  const seen = {};
+  d.tables.forEach(t => { for (let b = 2; b <= maxB; b++) {
+    const k = factKey(t, b);
+    if (!seen[k]) { seen[k] = true; pairs.push([Math.min(t,b), Math.max(t,b)]); }
+  }});
+  return pairs;
+}
+
+function factIsFluent(st) {
+  if (!st) return false;
+  const n = st.r + st.w;
+  return n >= 2 && st.r / n >= 0.8 && st.ema != null && st.ema <= FACT_FLUENT_MS;
+}
+
+function pickDrillFact(d) {
+  const pairs = allFactPairs(d);
+  const weights = pairs.map(([a,b]) => {
+    const k = factKey(a,b);
+    if (k === drillLastKey) return 0;
+    const st = d.facts[k];
+    if (!st) return 2.0;                                  // unseen: explore
+    const n = st.r + st.w;
+    let w = Math.max(0.3, Math.min(4, 1 / (st.r / n + 0.1)));
+    if (st.ema != null && st.ema > FACT_FLUENT_MS) w *= 1.6;   // slow: drill it
+    if (factIsFluent(st)) w = Math.min(w, 0.4);
+    return w;
+  });
+  const pair = weightedPick(pairs, weights);
+  return Math.random() < 0.5 ? pair : [pair[1], pair[0]];
+}
+
+function startDrill() {
+  drillScore = 0; drillTimeLeft = SPRINT_SECS; drillBusy = false; drillActive = true;
+  drillLastKey = null; sprintSeen = [];
+  showScreen('screen-drill');
+  const av = document.getElementById('drill-avatar');
+  av.className = 'avatar-sm av-' + currentPlayerName;
+  av.textContent = AVATARS[currentPlayerName];
+  document.getElementById('drill-name-tag').textContent = currentPlayerName === 'elsie' ? 'Elsie' : 'Freya';
+  document.getElementById('drill-card').innerHTML =
+    '<div class="question-text" id="drill-question"></div>' +
+    '<div class="input-row"><input type="text" id="drill-input" class="game-input" inputmode="numeric" placeholder="?" autocomplete="off" spellcheck="false"></div>' +
+    '<div class="feedback" id="drill-feedback"></div>';
+  document.getElementById('drill-input').addEventListener('input', drillOnType);
+  updateDrillHud();
+  clearInterval(drillTimer);
+  drillTimer = setInterval(() => {
+    drillTimeLeft--;
+    updateDrillHud();
+    if (drillTimeLeft <= 0) endDrill(false);
+  }, 1000);
+  nextDrillQuestion();
+}
+
+function updateDrillHud() {
+  document.getElementById('drill-score-chip').textContent = '⚡ ' + drillScore;
+  document.getElementById('drill-time-chip').textContent = '⏱ ' + Math.max(0, drillTimeLeft);
+  const bar = document.getElementById('timer-bar');
+  bar.style.width = (drillTimeLeft / SPRINT_SECS * 100) + '%';
+  bar.classList.toggle('low', drillTimeLeft <= 10);
+}
+
+function nextDrillQuestion() {
+  if (!drillActive) return;
+  const d = drillState(profile);
+  drillFact = pickDrillFact(d);
+  drillLastKey = factKey(drillFact[0], drillFact[1]);
+  const input = document.getElementById('drill-input');
+  input.value = '';
+  input.className = 'game-input';
+  document.getElementById('drill-feedback').textContent = '';
+  document.getElementById('drill-question').textContent = drillFact[0] + ' × ' + drillFact[1] + ' = ?';
+  speakText(drillFact[0] + ' times ' + drillFact[1], 1.0);
+  drillQStart = Date.now();
+  drillBusy = false;
+  input.focus({ preventScroll: true });
+  window.scrollTo(0, 0);
+}
+
+function recordFact(d, correct, ms) {
+  const k = factKey(drillFact[0], drillFact[1]);
+  if (!d.facts[k]) d.facts[k] = { r:0, w:0, ema:null };
+  const st = d.facts[k];
+  if (correct) { st.r++; st.ema = st.ema == null ? ms : Math.round(st.ema * 0.7 + ms * 0.3); }
+  else st.w++;
+  if (st.r + st.w > 20) { st.r = Math.ceil(st.r/2); st.w = Math.floor(st.w/2); }
+  sprintSeen.push(k);
+}
+
+function drillOnType() {
+  if (drillBusy || !drillActive) return;
+  const input = document.getElementById('drill-input');
+  const val = input.value.trim();
+  if (!val) return;
+  const answer = String(drillFact[0] * drillFact[1]);
+  if (val === answer) drillMark(true);
+  else if (val.length >= answer.length) drillMark(false);
+}
+
+function drillMark(correct) {
+  drillBusy = true;
+  const d = drillState(profile);
+  const ms = Math.min(Date.now() - drillQStart, 30000);
+  recordFact(d, correct, ms);
+  const input = document.getElementById('drill-input');
+  if (correct) {
+    drillScore++;
+    input.classList.add('flash-ok');
+    updateDrillHud();
+    setTimeout(nextDrillQuestion, 150);
+  } else {
+    input.classList.add('flash-no');
+    document.getElementById('drill-feedback').textContent = drillFact[0] + ' × ' + drillFact[1] + ' = ' + (drillFact[0] * drillFact[1]);
+    setTimeout(nextDrillQuestion, 1400);
+  }
+  saveChild(profile);
+}
+
+function endDrill(abandoned) {
+  clearInterval(drillTimer);
+  drillActive = false;
+  window.speechSynthesis.cancel();
+  if (abandoned) { goModeSelect(); return; }
+  const d = drillState(profile);
+  d.sprints++;
+  const isRecord = drillScore > d.best;
+  if (isRecord) d.best = drillScore;
+  // unlock the next table when 70%+ of the active facts are fluent
+  let unlockMsg = '';
+  const pairs = allFactPairs(d);
+  const fluent = pairs.filter(([a,b]) => factIsFluent(d.facts[factKey(a,b)])).length;
+  if (fluent / pairs.length >= 0.7 && d.tables.length < TABLE_ORDER.length) {
+    const next = TABLE_ORDER[d.tables.length];
+    d.tables.push(next);
+    unlockMsg = '<div class="rec">🔓 New table unlocked: ' + next + '×!</div>';
+  }
+  const pts = Math.max(1, Math.floor(drillScore / 2));
+  // weakest facts this sprint (wrong or slow)
+  const watch = [...new Set(sprintSeen)].filter(k => { const st = d.facts[k]; return st && (st.w > st.r || (st.ema != null && st.ema > FACT_FLUENT_MS)); }).slice(0, 3);
+  document.getElementById('drill-card').innerHTML =
+    '<div class="drill-results">' +
+    '<div>' + (isRecord ? '🏆 NEW RECORD!' : '⚡ Sprint done!') + '</div>' +
+    '<div class="big-score">' + drillScore + '</div>' +
+    (isRecord ? '<div class="rec">Best ever!</div>' : '<div class="watch">Best: <b>' + d.best + '</b></div>') +
+    unlockMsg +
+    (watch.length ? '<div class="watch">Ones to watch: <b>' + watch.map(k => k.replace('x',' × ')).join(', ') + '</b></div>' : '') +
+    '<div class="watch">+' + pts + ' ⭐ toward today\'s goal</div>' +
+    '<div class="action-row">' +
+    '<button class="btn" onclick="goModeSelect()">Done</button>' +
+    '<button class="btn btn-primary" onclick="startDrill()">Go again ⚡</button>' +
+    '</div></div>';
+  if (isRecord || fluent / pairs.length >= 0.7) spawnConfetti();
+  speakText(drillScore + ' correct! ' + (isRecord ? 'New record!' : 'Well done!'), 1.0);
+  addPoints(profile, pts);
+  saveChild(profile);
 }
 
 // =====================================================================
@@ -1760,6 +1985,15 @@ function renderKid(name) {
     });
   }
 
+  const d = drillState(p);
+  const factKeys = Object.keys(d.facts);
+  if (factKeys.length || d.sprints) {
+    const weak = factKeys.filter(k => { const st = d.facts[k]; return st.w > st.r || (st.ema != null && st.ema > FACT_FLUENT_MS && st.r + st.w >= 2); })
+      .slice(0, 5).map(k => k.replace('x', '×'));
+    html += '<div class="bandhd">Tables sprint</div><div class="prow"><span class="pname">⚡ Tables: ' + d.tables.slice().sort((a,b)=>a-b).join(', ') + '</span>' +
+      '<span class="pill st-solid">Best ' + d.best + '</span><span class="ppct">' + d.sprints + ' runs</span></div>';
+    if (weak.length) html += '<div class="trouble">✖️ Facts to watch: <b>' + weak.join(', ') + '</b></div>';
+  }
   const trouble = Object.keys(p.spelling.words).filter(w => { const ws = p.spelling.words[w]; return ws.w > 0 && ws.s < 2; });
   if (trouble.length) html += '<div class="trouble">📝 Tricky words right now: <b>' + trouble.slice(0, 10).join(', ') + '</b></div>';
   html += '</div>';
@@ -1821,6 +2055,10 @@ document.addEventListener('keydown', (e) => {
       if (document.getElementById('done-overlay').classList.contains('show')) return;
       if (waiting) nextQuestion();
       else checkAnswer();
+    } else if (drillActive && !drillBusy) {
+      // Enter judges a too-short answer (e.g. typed "9" when it's "12")
+      const di = document.getElementById('drill-input');
+      if (di && di.value.trim()) drillMark(di.value.trim() === String(drillFact[0] * drillFact[1]));
     }
   }
 });
