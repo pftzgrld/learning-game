@@ -4,38 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Learning Game">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Learning Club">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#1e1b4b">
+<meta name="theme-color" content="#f8f9fa">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e1b4b'/><text y='68' x='50' text-anchor='middle' font-size='50'>üéì</text></svg>">
-<title>Learning Game</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23ffffff'/><text y='68' x='50' text-anchor='middle' font-size='50'>🎓</text></svg>">
+<title>Learning Club</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --pink: #ff6b9d;
-    --purple: #c084fc;
-    --blue: #60a5fa;
-    --green: #34d399;
-    --yellow: #fbbf24;
-    --orange: #fb923c;
-    --bg: #1e1b4b;
-    --card: #312e81;
-    --text: #f8fafc;
+    --bg:#f8f9fa; --surface:#ffffff; --surface-2:#f8f9fa; --ink:#202124; --muted:#5f6368;
+    --line:#dadce0; --accent:#1a73e8; --accent-ink:#1967d2; --ring:#1a73e8;
+    --chip-bg:#e8f0fe; --chip-ink:#1967d2;
+    --ok:#188038; --ok-bg:#e6f4ea; --warn:#b06000; --warn-bg:#fef7e0; --crit:#c5221f; --crit-bg:#fce8e6;
+    --g-blue:#4285f4; --g-green:#34a853; --g-yellow:#f9ab00; --g-red:#ea4335; --g-purple:#9334e6;
+    --shadow:0 1px 2px rgba(60,64,67,.14),0 1px 3px 1px rgba(60,64,67,.08);
+    --shadow-hover:0 1px 2px rgba(60,64,67,.16),0 2px 8px 1px rgba(60,64,67,.12);
   }
 
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
     background: var(--bg);
-    color: var(--text);
+    color: var(--ink);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     padding: 20px;
     padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 20px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px);
     overflow-x: hidden;
@@ -44,490 +43,357 @@
     user-select: none;
   }
 
-  .screen { display: none; width: 100%; max-width: 600px; text-align: center; }
+  .screen { display: none; width: 100%; max-width: 640px; text-align: center; margin-top: 12px; }
   .screen.active { display: block; }
 
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  h1.brand { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 4px; }
+  h1.brand .cap { color: var(--g-blue); }
+  h1.brand .l1 { color: var(--g-red); }
+  h1.brand .l2 { color: var(--g-yellow); }
+  h1.brand .l3 { color: var(--g-green); }
+  .tagline { color: var(--muted); font-size: 14.5px; margin-bottom: 28px; }
 
-  .subtitle { color: #a5b4fc; font-size: 1.1rem; margin-bottom: 40px; }
-
-  .profiles, .modes { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .profiles, .modes { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
   .profile-btn, .mode-btn {
-    background: var(--card);
-    border: 3px solid transparent;
-    border-radius: 20px;
-    padding: 30px 40px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 26px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: .12s;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    min-width: 180px;
-    color: var(--text);
+    gap: 10px;
+    min-width: 170px;
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    font-family: inherit;
   }
-
-  .profile-btn:hover, .mode-btn:hover { border-color: var(--purple); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(192,132,252,0.3); }
+  .profile-btn:hover, .mode-btn:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
 
   .profile-avatar, .mode-icon {
-    width: 80px; height: 80px;
+    width: 72px; height: 72px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
+  .av-elsie { background: var(--crit-bg); }
+  .av-freya { background: var(--ok-bg); }
+  .av-teddy { background: var(--warn-bg); }
+  .av-spelling { background: var(--chip-bg); }
+  .av-maths { background: var(--warn-bg); }
 
-  .profile-btn:nth-child(1) .profile-avatar { background: linear-gradient(135deg, #ff6b6b, #ffa500, #ffd700, #34d399, #60a5fa, #c084fc); }
-  .profile-btn:nth-child(2) .profile-avatar { background: linear-gradient(135deg, var(--blue), var(--green)); }
-  .profile-btn:nth-child(3) .profile-avatar { background: linear-gradient(135deg, var(--yellow), var(--orange)); }
+  .profile-name, .mode-name { font-size: 1.25rem; font-weight: 700; }
+  .profile-info, .mode-info { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
 
-  .mode-btn:first-child .mode-icon { background: linear-gradient(135deg, var(--yellow), var(--orange)); }
-  .mode-btn:last-child .mode-icon { background: linear-gradient(135deg, var(--green), var(--blue)); }
+  .homefoot { margin-top: 30px; }
+  .linkbtn { background: none; border: 0; color: var(--accent); font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit; padding: 8px; }
 
-  .profile-name, .mode-name { font-size: 1.4rem; font-weight: 700; }
-  .profile-info, .mode-info { font-size: 0.85rem; color: #a5b4fc; }
-
-  .game-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding: 0 4px;
-  }
-
-  .player-tag {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--card);
-    padding: 8px 16px;
-    border-radius: 30px;
-  }
-
-  .player-tag .avatar-sm {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem;
-  }
-
-  .player-tag.elsie .avatar-sm { background: linear-gradient(135deg, var(--pink), var(--purple)); }
-  .player-tag.freya .avatar-sm { background: linear-gradient(135deg, var(--blue), var(--green)); }
-  .player-tag.teddy .avatar-sm { background: linear-gradient(135deg, var(--yellow), var(--orange)); }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .topbar .left, .topbar .right { display: flex; align-items: center; gap: 8px; }
 
   .nav-pill {
-    background: rgba(165,180,252,0.15);
-    border: 1px solid rgba(165,180,252,0.3);
-    color: #a5b4fc;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 8px 16px;
-    border-radius: 20px;
-    transition: all 0.2s;
-    white-space: nowrap;
+    background: var(--surface); border: 1px solid var(--line); color: var(--muted);
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; padding: 8px 14px;
+    border-radius: 999px; transition: .12s; white-space: nowrap; font-family: inherit; box-shadow: var(--shadow);
   }
-  .nav-pill:hover { background: rgba(165,180,252,0.25); }
+  .nav-pill:hover { border-color: var(--accent); color: var(--ink); }
 
-  .screen-header {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 20px;
-    width: 100%;
+  .who-chip {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--surface);
+    border: 1px solid var(--line); padding: 6px 14px 6px 6px; border-radius: 999px;
+    font-weight: 700; font-size: 0.95rem; box-shadow: var(--shadow);
+  }
+  .who-chip .avatar-sm { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+
+  .streak-chip {
+    background: var(--warn-bg); color: var(--warn); border-radius: 999px; padding: 6px 12px;
+    font-size: 0.85rem; font-weight: 700; white-space: nowrap;
   }
 
-  .mode-tag {
-    display: inline-block;
-    background: rgba(165,180,252,0.15);
-    padding: 3px 12px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    color: #a5b4fc;
-    margin-bottom: 8px;
+  .ringwrap { position: relative; width: 48px; height: 48px; }
+  .ringwrap svg { transform: rotate(-90deg); }
+  .ringwrap .ring-track { stroke: var(--line); }
+  .ringwrap .ring-fill { stroke: var(--accent); transition: stroke-dashoffset .4s ease; }
+  .ringwrap.done .ring-fill { stroke: var(--ok); }
+  .ringwrap .ring-label {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 0.62rem; font-weight: 700; color: var(--ink);
   }
 
-  .level-badge {
-    background: linear-gradient(135deg, var(--purple), var(--blue));
-    display: inline-block;
-    padding: 6px 20px;
-    border-radius: 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 24px;
+  .topic-chip {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--chip-bg); color: var(--chip-ink);
+    border-radius: 999px; padding: 5px 14px; font-size: 0.85rem; font-weight: 600; margin-bottom: 14px;
   }
-
-  .stats-row {
-    display: flex; justify-content: center; gap: 24px;
-    margin-bottom: 30px; flex-wrap: wrap;
-  }
-
-  .stat { text-align: center; }
-  .stat-val { font-size: 1.6rem; font-weight: 700; }
-  .stat-label { font-size: 0.75rem; color: #a5b4fc; text-transform: uppercase; letter-spacing: 1px; }
+  .topic-chip .tc-note { font-weight: 700; }
 
   .game-card {
-    background: var(--card);
-    border-radius: 24px;
-    padding: 40px 30px;
-    margin-bottom: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 32px 26px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow);
   }
 
-  .hint-text {
-    font-size: 1.15rem;
-    color: #c7d2fe;
-    line-height: 1.6;
-    margin-bottom: 28px;
-    min-height: 56px;
-  }
+  .hint-text { font-size: 1.05rem; color: var(--muted); line-height: 1.6; margin-bottom: 22px; min-height: 34px; }
+  .hint-text em { color: var(--warn); font-style: normal; font-weight: 600; }
 
-  .question-text {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 8px;
-    min-height: 48px;
-    letter-spacing: 1px;
-  }
+  .question-text { font-size: 2rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; min-height: 44px; letter-spacing: 0.5px; }
+  .question-visual { margin: 8px 0 14px; min-height: 0; display: flex; justify-content: center; align-items: flex-end; }
 
-  .hint-text em { color: var(--yellow); font-style: normal; font-weight: 600; }
-
-  .input-row { display: flex; gap: 12px; justify-content: center; align-items: center; }
+  .input-row { display: flex; gap: 10px; justify-content: center; align-items: center; }
 
   .game-input {
-    font-size: 1.5rem;
-    padding: 14px 20px;
-    border-radius: 16px;
-    border: 3px solid #4338ca;
-    background: #1e1b4b;
-    color: var(--text);
-    text-align: center;
-    width: 100%;
-    max-width: 340px;
-    outline: none;
-    transition: border-color 0.3s;
-    font-family: inherit;
-    -webkit-user-select: text;
-    user-select: text;
+    font-size: 1.4rem; padding: 12px 18px; border-radius: 12px;
+    border: 2px solid var(--line); background: var(--surface); color: var(--ink);
+    text-align: center; width: 100%; max-width: 340px; outline: none;
+    transition: border-color .2s; font-family: inherit;
+    -webkit-user-select: text; user-select: text;
   }
-
   .game-input.spelling-input { letter-spacing: 2px; }
-  .game-input:focus { border-color: var(--purple); }
-  .game-input.correct { border-color: var(--green); background: rgba(52,211,153,0.1); }
-  .game-input.wrong { border-color: var(--pink); background: rgba(255,107,157,0.1); }
+  .game-input:focus { border-color: var(--accent); }
+  .game-input.correct { border-color: var(--g-green); background: var(--ok-bg); }
+  .game-input.wrong { border-color: var(--g-red); background: var(--crit-bg); }
 
   .btn {
-    padding: 14px 32px;
-    border-radius: 16px;
-    border: none;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
+    padding: 12px 28px; border-radius: 999px; border: 1px solid var(--line);
+    font-size: 1rem; font-weight: 700; cursor: pointer; transition: .12s;
+    font-family: inherit; background: var(--surface); color: var(--ink); box-shadow: var(--shadow);
   }
-
-  .btn:hover { transform: translateY(-2px); }
+  .btn:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
   .btn:active { transform: translateY(0); }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--purple), var(--blue));
-    color: white;
-    box-shadow: 0 4px 15px rgba(96,165,250,0.3);
-  }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-ink); }
 
   .btn-hear {
-    background: var(--card);
-    border: 2px solid #4338ca;
-    color: var(--text);
-    padding: 14px 20px;
-    font-size: 1.3rem;
-    border-radius: 50%;
-    width: 56px; height: 56px;
-    display: flex; align-items: center; justify-content: center;
+    background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+    font-size: 1.2rem; border-radius: 50%; width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center; padding: 0;
   }
+  .btn-hear:hover { border-color: var(--accent); }
 
-  .btn-hear:hover { border-color: var(--purple); }
+  .action-row { display: flex; gap: 12px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
 
-  .action-row {
-    display: flex; gap: 12px;
-    justify-content: center;
-    margin-top: 20px;
-    flex-wrap: wrap;
+  .feedback { margin-top: 18px; font-size: 1.2rem; font-weight: 700; min-height: 36px; }
+  .feedback.correct-fb { color: var(--ok); }
+  .feedback.wrong-fb { color: var(--crit); }
+  .feedback .bonus { display: block; font-size: 0.9rem; color: var(--warn); }
+
+  .correct-answer { margin-top: 8px; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; color: var(--warn); }
+
+  .overlay {
+    position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px; background: rgba(248,249,250,.96); z-index: 100; text-align: center; padding: 24px;
   }
+  .overlay.show { display: flex; }
+  .overlay .big { font-size: 4rem; }
+  .overlay .msg { font-size: 1.7rem; font-weight: 700; }
+  .overlay .sub { font-size: 1.05rem; color: var(--muted); margin-bottom: 14px; }
+  .overlay .action-row { margin-top: 4px; }
 
-  .feedback {
-    margin-top: 20px;
-    font-size: 1.3rem;
-    font-weight: 700;
-    min-height: 40px;
-    transition: all 0.3s;
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--ink); color: #fff; border-radius: 999px; padding: 12px 22px;
+    font-size: 0.95rem; font-weight: 600; z-index: 120; opacity: 0; transition: .25s; white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis;
   }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-  .feedback.correct-fb { color: var(--green); }
-  .feedback.wrong-fb { color: var(--pink); }
-
-  .correct-answer {
-    margin-top: 10px;
-    font-size: 1.6rem;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: var(--yellow);
-  }
-
-  .level-change {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 12px;
-    background: rgba(30,27,75,0.92);
-    z-index: 100;
-    animation: fadeInOut 2s forwards;
-    pointer-events: none;
-  }
-
-  .level-change .emoji { font-size: 4rem; }
-  .level-change .msg { font-size: 1.8rem; font-weight: 700; }
-  .level-change.up .msg { color: var(--green); }
-  .level-change.down .msg { color: var(--orange); }
-
-  @keyframes fadeInOut {
-    0% { opacity: 0; }
-    15% { opacity: 1; }
-    75% { opacity: 1; }
-    100% { opacity: 0; }
-  }
-
-  .confetti-piece {
-    position: fixed;
-    width: 10px; height: 10px;
-    border-radius: 2px;
-    z-index: 90;
-    animation: confettiFall 1.5s forwards;
-    pointer-events: none;
-  }
-
+  .confetti-piece { position: fixed; width: 10px; height: 10px; border-radius: 2px; z-index: 90; animation: confettiFall 1.5s forwards; pointer-events: none; }
   @keyframes confettiFall {
     0% { transform: translateY(0) rotate(0deg); opacity: 1; }
     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
 
-  .streak-fire { display: inline; }
-
-  /* ===== TEDDY SCREEN STYLES ===== */
-  .teddy-stars { margin-bottom: 16px; font-size: 1.5rem; letter-spacing: 4px; min-height: 32px; }
-
-  .teddy-prompt {
-    font-size: 1.6rem; font-weight: 700; color: var(--text);
-    margin-bottom: 20px; min-height: 48px;
-  }
-
-  .teddy-visual {
-    font-size: 3.5rem; margin-bottom: 24px; min-height: 60px;
-    letter-spacing: 8px; line-height: 1.4;
-  }
-
-  .teddy-choices {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 16px; max-width: 400px; margin: 0 auto;
-  }
-
+  /* ===== TEDDY ===== */
+  .teddy-stars { margin-bottom: 14px; font-size: 1.4rem; letter-spacing: 4px; min-height: 30px; }
+  .teddy-prompt { font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: 18px; min-height: 44px; }
+  .teddy-visual { font-size: 3.4rem; margin-bottom: 22px; min-height: 60px; letter-spacing: 8px; line-height: 1.4; }
+  .teddy-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 400px; margin: 0 auto; }
   .teddy-choice {
-    background: var(--bg); border: 3px solid #4338ca; border-radius: 20px;
-    padding: 24px 16px; font-size: 2.2rem; cursor: pointer;
-    transition: all 0.2s; color: var(--text);
-    display: flex; align-items: center; justify-content: center;
-    min-height: 90px;
+    background: var(--surface); border: 2px solid var(--line); border-radius: 16px;
+    padding: 22px 14px; font-size: 2.1rem; cursor: pointer; transition: .12s; color: var(--ink);
+    display: flex; align-items: center; justify-content: center; min-height: 88px; box-shadow: var(--shadow); font-family: inherit;
   }
-  .teddy-choice:hover { border-color: var(--purple); transform: scale(1.03); }
-  .teddy-choice.correct-choice { border-color: var(--green); background: rgba(52,211,153,0.15); transform: scale(1.05); }
-  .teddy-choice.wrong-choice { border-color: var(--pink); background: rgba(255,107,157,0.1); opacity: 0.6; }
+  .teddy-choice:hover { border-color: var(--accent); transform: scale(1.03); }
+  .teddy-choice.correct-choice { border-color: var(--g-green); background: var(--ok-bg); transform: scale(1.05); }
+  .teddy-choice.wrong-choice { border-color: var(--g-red); background: var(--crit-bg); opacity: 0.6; }
   .teddy-choice.disabled { pointer-events: none; }
+  .teddy-feedback { margin-top: 18px; font-size: 1.4rem; font-weight: 700; min-height: 38px; }
+  .teddy-feedback.correct-fb { color: var(--ok); }
+  .teddy-feedback.wrong-fb { color: var(--crit); }
 
-  .teddy-feedback { margin-top: 20px; font-size: 1.5rem; font-weight: 700; min-height: 40px; }
-  .teddy-feedback.correct-fb { color: var(--green); }
-  .teddy-feedback.wrong-fb { color: var(--pink); }
-
-  /* Numberblocks block towers & arrays */
+  /* Numberblocks visuals */
   .nb-tower { display: inline-flex; flex-direction: column-reverse; align-items: center; margin: 0 6px; }
   .nb-block { width: 28px; height: 28px; border-radius: 4px; margin: 1px 0; border: 1px solid rgba(0,0,0,0.15); }
-  .nb-label { font-size: 1rem; font-weight: 700; margin-top: 2px; color: var(--text); }
+  .nb-label { font-size: 1rem; font-weight: 700; margin-top: 2px; color: var(--ink); }
   .nb-sum { display: flex; align-items: flex-end; justify-content: center; gap: 8px; flex-wrap: wrap; }
-  .nb-op { font-size: 1.5rem; font-weight: 700; align-self: center; color: var(--text); }
+  .nb-op { font-size: 1.5rem; font-weight: 700; align-self: center; color: var(--ink); }
   .nb-array { display: inline-grid; gap: 2px; }
   .nb-array .nb-block { width: 24px; height: 24px; }
-  .nb-array-label { font-size: 0.9rem; font-weight: 600; margin-top: 4px; color: var(--text); text-align: center; }
-  /* Smaller blocks for Elsie/Freya visual area */
+  .nb-array-label { font-size: 0.9rem; font-weight: 600; margin-top: 4px; color: var(--ink); text-align: center; }
   .nb-sm .nb-block { width: 20px; height: 20px; }
   .nb-sm .nb-label { font-size: 0.85rem; }
   .nb-sm .nb-array .nb-block { width: 18px; height: 18px; }
-  /* Visual area for Elsie/Freya game */
-  .question-visual { margin: 8px 0; min-height: 0; display: flex; justify-content: center; align-items: flex-end; }
 
-  @media (max-width: 500px) {
+  /* ===== PARENT VIEW ===== */
+  #screen-parent { text-align: left; }
+  .p-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .p-head h2 { font-size: 1.4rem; }
+  .kid-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .kid-card h3 { font-size: 1.15rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .chip { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+  .dots { display: flex; gap: 4px; margin: 6px 0 12px; align-items: center; flex-wrap: wrap; }
+  .dot { width: 12px; height: 12px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--line); }
+  .dot.hit { background: var(--g-green); border-color: var(--g-green); }
+  .dot.part { background: var(--warn-bg); border-color: var(--g-yellow); }
+  .dots .lbl { font-size: 11px; color: var(--muted); font-weight: 700; margin-right: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .bandhd { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 12px 0 4px; }
+  .prow { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--surface-2); font-size: 13.5px; }
+  .prow .pname { font-weight: 600; text-align: left; }
+  .prow .ppct { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12.5px; min-width: 38px; text-align: right; }
+  .pill { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  .pill.st-mastered { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
+  .pill.st-solid { background: var(--chip-bg); color: var(--chip-ink); border-color: transparent; }
+  .pill.st-learning { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .pill.st-shaky { background: var(--crit-bg); color: var(--crit); border-color: transparent; }
+  .pill.st-new, .pill.st-locked { background: var(--surface-2); }
+  .trouble { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .trouble b { color: var(--crit); }
+
+  @media (max-width: 520px) {
     body { padding: 12px; padding-top: env(safe-area-inset-top, 12px); }
-    h1 { font-size: 1.8rem; }
-    .subtitle { font-size: 1rem; margin-bottom: 24px; }
-    .profiles, .modes { flex-direction: column; align-items: stretch; gap: 12px; }
-    .profile-btn, .mode-btn {
-      flex-direction: row; gap: 16px; text-align: left;
-      padding: 20px 24px; min-width: unset; flex: unset;
-    }
-    .profile-avatar, .mode-icon { width: 56px; height: 56px; font-size: 1.8rem; flex-shrink: 0; }
-    .profile-name, .mode-name { font-size: 1.3rem; }
-    .profile-info, .mode-info { font-size: 0.9rem; }
-    .screen-header { margin-bottom: 12px; }
-    .nav-pill { font-size: 0.8rem; padding: 8px 14px; min-height: 40px; }
-    .game-header { margin-bottom: 12px; }
+    h1.brand { font-size: 1.6rem; }
+    .tagline { margin-bottom: 20px; }
+    .profiles, .modes { flex-direction: column; align-items: stretch; gap: 10px; }
+    .profile-btn, .mode-btn { flex-direction: row; gap: 14px; text-align: left; padding: 16px 20px; min-width: unset; }
+    .profile-avatar, .mode-icon { width: 52px; height: 52px; font-size: 1.7rem; flex-shrink: 0; }
     .game-card { padding: 20px 16px; }
-    .game-input { font-size: 16px; max-width: 100%; padding: 14px; }
     .question-text { font-size: 1.5rem; }
-    .hint-text { font-size: 1rem; margin-bottom: 16px; min-height: 36px; }
-    .stats-row { gap: 16px; margin-bottom: 16px; }
-    .stat-val { font-size: 1.3rem; }
-    .level-badge { font-size: 0.9rem; padding: 5px 16px; margin-bottom: 12px; }
-    .btn { padding: 14px 28px; font-size: 1rem; min-height: 48px; }
-    .btn-hear { width: 48px; height: 48px; min-height: 48px; font-size: 1.2rem; padding: 12px; }
-    .input-row { gap: 8px; }
-    .action-row { margin-top: 12px; }
-    .feedback { font-size: 1.1rem; }
-    .correct-answer { font-size: 1.3rem; }
-    .player-tag { padding: 6px 12px; }
-    .player-tag .avatar-sm { width: 28px; height: 28px; font-size: 0.9rem; }
-    /* Teddy mobile */
-    .teddy-visual { font-size: 2.8rem; letter-spacing: 4px; }
-    .teddy-choice { padding: 20px 12px; font-size: 1.8rem; min-height: 80px; }
-    .teddy-prompt { font-size: 1.3rem; }
-  }
-
-  @media (max-width: 360px) {
-    h1 { font-size: 1.5rem; }
-    .profile-btn, .mode-btn { padding: 16px 18px; }
-    .profile-avatar, .mode-icon { width: 48px; height: 48px; font-size: 1.5rem; }
-    .game-card { padding: 16px 12px; }
-    .question-text { font-size: 1.3rem; }
+    .hint-text { font-size: 0.95rem; margin-bottom: 14px; min-height: 30px; }
+    .game-input { font-size: 16px; max-width: 100%; padding: 12px; }
+    .btn { padding: 12px 24px; font-size: 0.95rem; min-height: 46px; }
+    .teddy-visual { font-size: 2.7rem; letter-spacing: 4px; }
+    .teddy-choice { padding: 18px 12px; font-size: 1.7rem; min-height: 78px; }
+    .teddy-prompt { font-size: 1.25rem; }
+    .topbar { gap: 6px; }
   }
 
   /* Compact layout when mobile keyboard is open */
-  .keyboard-open .game-header { margin-bottom: 6px; }
-  .keyboard-open .mode-tag { display: none; }
-  .keyboard-open .level-badge { margin-bottom: 6px; padding: 3px 12px; font-size: 0.75rem; }
-  .keyboard-open .stats-row { margin-bottom: 6px; gap: 12px; }
-  .keyboard-open .stat-val { font-size: 1rem; }
-  .keyboard-open .stat-label { font-size: 0.6rem; }
+  .keyboard-open .topbar { margin-bottom: 6px; }
+  .keyboard-open .topic-chip { margin-bottom: 6px; padding: 3px 12px; font-size: 0.75rem; }
   .keyboard-open .game-card { padding: 14px 12px; }
-  .keyboard-open .hint-text { font-size: 0.85rem; margin-bottom: 10px; min-height: unset; }
+  .keyboard-open .hint-text { font-size: 0.85rem; margin-bottom: 8px; min-height: unset; }
   .keyboard-open .question-text { font-size: 1.2rem; min-height: unset; margin-bottom: 4px; }
+  .keyboard-open .question-visual { display: none; }
   .keyboard-open .feedback { min-height: unset; margin-top: 6px; font-size: 0.95rem; }
   .keyboard-open .correct-answer { font-size: 1.1rem; margin-top: 4px; }
   .keyboard-open .action-row { margin-top: 8px; }
-  .keyboard-open .btn { padding: 12px 24px; font-size: 0.95rem; min-height: 42px; }
+  .keyboard-open .btn { padding: 10px 22px; font-size: 0.9rem; min-height: 42px; }
 </style>
 </head>
 <body>
 
-<!-- ===== SCREEN 1: PROFILE SELECT ===== -->
+<!-- ===== SCREEN: PROFILE SELECT ===== -->
 <div class="screen active" id="screen-select">
-  <h1>Learning Adventure</h1>
-  <p class="subtitle">Who's playing?</p>
+  <h1 class="brand">🎓 <span class="cap">L</span>earning <span class="l1">C</span><span class="l2">l</span><span class="l3">u</span>b</h1>
+  <p class="tagline">A little every day goes a long way ✨</p>
   <div class="profiles">
     <button class="profile-btn" onclick="selectPlayer('elsie')">
-      <div class="profile-avatar">&#x1F451;</div>
+      <div class="profile-avatar av-elsie">👑</div>
       <div class="profile-name">Elsie</div>
       <div class="profile-info" id="elsie-info">4th Class</div>
     </button>
     <button class="profile-btn" onclick="selectPlayer('freya')">
-      <div class="profile-avatar">&#x1F431;</div>
+      <div class="profile-avatar av-freya">🐱</div>
       <div class="profile-name">Freya</div>
       <div class="profile-info" id="freya-info">2nd Class</div>
     </button>
     <button class="profile-btn" onclick="selectPlayer('teddy')">
-      <div class="profile-avatar">&#x1F9F8;</div>
+      <div class="profile-avatar av-teddy">🧸</div>
       <div class="profile-name">Teddy</div>
-      <div class="profile-info" id="teddy-info">Explorer</div>
+      <div class="profile-info" id="teddy-info">Little Explorer</div>
     </button>
+  </div>
+  <div class="homefoot">
+    <button class="linkbtn" onclick="showParent()">👪 For parents</button>
   </div>
 </div>
 
-<!-- ===== SCREEN 2: MODE SELECT ===== -->
+<!-- ===== SCREEN: MODE SELECT ===== -->
 <div class="screen" id="screen-mode">
-  <div class="screen-header">
-    <button class="nav-pill" onclick="goHome()">&#8592; Switch player</button>
+  <div class="topbar">
+    <div class="left"><button class="nav-pill" onclick="goHome()">← Switch player</button></div>
+    <div class="right" id="mode-daily"></div>
   </div>
-  <h1 id="mode-title">What shall we practise?</h1>
-  <p class="subtitle" id="mode-subtitle"></p>
+  <h1 class="brand" id="mode-title">What shall we practise? 🤔</h1>
+  <p class="tagline" id="mode-subtitle"></p>
   <div class="modes">
     <button class="mode-btn" onclick="startGame('spelling')">
-      <div class="mode-icon">&#x1F4DD;</div>
+      <div class="mode-icon av-spelling">📝</div>
       <div class="mode-name">Spelling</div>
       <div class="mode-info" id="spelling-level-info"></div>
     </button>
     <button class="mode-btn" onclick="startGame('maths')">
-      <div class="mode-icon">&#x1F522;</div>
+      <div class="mode-icon av-maths">🔢</div>
       <div class="mode-name">Maths</div>
       <div class="mode-info" id="maths-level-info"></div>
     </button>
   </div>
 </div>
 
-<!-- ===== SCREEN 3: GAME (Elsie/Freya) ===== -->
+<!-- ===== SCREEN: GAME (Elsie/Freya) ===== -->
 <div class="screen" id="screen-game">
-  <div class="game-header">
-    <div class="player-tag" id="player-tag">
-      <div class="avatar-sm"></div>
-      <span id="player-name-tag"></span>
+  <div class="topbar">
+    <div class="left">
+      <button class="nav-pill" onclick="goModeSelect()">←</button>
+      <div class="who-chip" id="player-tag"><div class="avatar-sm" id="player-avatar"></div><span id="player-name-tag"></span></div>
     </div>
-    <button class="nav-pill" onclick="goModeSelect()">&#8592; Change subject</button>
-  </div>
-
-  <div class="mode-tag" id="mode-tag-label"></div>
-  <div class="level-badge" id="level-badge"></div>
-
-  <div class="stats-row">
-    <div class="stat">
-      <div class="stat-val" id="stat-score">0</div>
-      <div class="stat-label">Score</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="stat-streak">0</div>
-      <div class="stat-label">Streak</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="stat-best">0</div>
-      <div class="stat-label">Best Streak</div>
+    <div class="right">
+      <div class="streak-chip" id="daystreak-chip">🔥 0</div>
+      <div class="ringwrap" id="ringwrap">
+        <svg width="48" height="48" viewBox="0 0 48 48">
+          <circle class="ring-track" cx="24" cy="24" r="19" fill="none" stroke-width="5"></circle>
+          <circle class="ring-fill" id="ring-fill" cx="24" cy="24" r="19" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="119.4"></circle>
+        </svg>
+        <div class="ring-label" id="ring-label">0</div>
+      </div>
     </div>
   </div>
+
+  <div class="topic-chip" id="topic-chip"></div>
 
   <div class="game-card">
     <div class="question-text" id="question-text" style="display:none"></div>
     <div class="question-visual" id="question-visual" style="display:none"></div>
     <div class="hint-text" id="hint-text"></div>
     <div class="input-row">
-      <button class="btn btn-hear" id="btn-hear" onclick="hearWord()" title="Hear the word again">&#128264;</button>
+      <button class="btn btn-hear" id="btn-hear" onclick="hearWord()" title="Hear the word again">🔊</button>
       <input type="text" id="game-input" class="game-input" placeholder="Type your answer..." autocomplete="off" autocapitalize="none" spellcheck="false">
     </div>
     <div class="action-row">
-      <button class="btn btn-primary" id="btn-check" onclick="checkAnswer()">Check &#10003;</button>
+      <button class="btn btn-primary" id="btn-check" onclick="checkAnswer()">Check ✓</button>
     </div>
     <div class="feedback" id="feedback"></div>
     <div class="correct-answer" id="correct-answer"></div>
   </div>
 </div>
 
-<!-- ===== SCREEN 4: TEDDY'S GAME ===== -->
+<!-- ===== SCREEN: TEDDY ===== -->
 <div class="screen" id="screen-teddy">
-  <div class="game-header">
-    <div class="player-tag teddy">
-      <div class="avatar-sm">&#x1F9F8;</div>
-      <span>Teddy</span>
+  <div class="topbar">
+    <div class="left">
+      <button class="nav-pill" onclick="goHome()">←</button>
+      <div class="who-chip"><div class="avatar-sm av-teddy">🧸</div><span>Teddy</span></div>
     </div>
-    <button class="nav-pill" onclick="goHome()">&#8592; Switch player</button>
+    <div class="right">
+      <div class="streak-chip" id="teddy-daystreak">🔥 0</div>
+    </div>
   </div>
   <div class="teddy-stars" id="teddy-stars"></div>
   <div class="game-card">
@@ -538,8 +404,36 @@
   </div>
 </div>
 
+<!-- ===== SCREEN: PARENT ===== -->
+<div class="screen" id="screen-parent">
+  <div class="p-head">
+    <h2>👪 Parent view</h2>
+    <button class="nav-pill" onclick="goHome()">← Back</button>
+  </div>
+  <div id="parent-content"></div>
+</div>
+
+<!-- ===== DONE OVERLAY ===== -->
+<div class="overlay" id="done-overlay">
+  <div class="big">🎉</div>
+  <div class="msg" id="done-msg">Daily goal smashed!</div>
+  <div class="sub" id="done-sub"></div>
+  <div class="action-row">
+    <button class="btn" onclick="hideDone(false)">Keep going 💪</button>
+    <button class="btn btn-primary" onclick="hideDone(true)">All done for today ✅</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-// ===== SPELLING WORD BANK =====
+// =====================================================================
+// CONTENT — word banks, generators, visuals (Teddy content unchanged)
+// =====================================================================
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function gcd(a,b) { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b];} return a; }
+
 const WORDS = {
   1: [
     { word: "friend", hint: "Someone you like to play with is called a ___." },
@@ -610,7 +504,7 @@ const WORDS = {
     { word: "jewellery", hint: "Mum keeps her ___ in a special box." },
     { word: "language", hint: "Irish is a ___ spoken in Ireland." },
     { word: "medicine", hint: "The doctor gave her ___ for her cough." },
-    { word: "recommend", hint: "I ___ this book \u2014 it's brilliant." },
+    { word: "recommend", hint: "I ___ this book — it's brilliant." },
     { word: "strength", hint: "It takes a lot of ___ to lift that heavy box." },
     { word: "vegetable", hint: "A carrot is a ___ that grows underground." },
     { word: "adventure", hint: "The explorers went on an amazing ___." },
@@ -632,7 +526,7 @@ const WORDS = {
     { word: "temperature", hint: "The ___ dropped below zero last night." },
     { word: "government", hint: "The ___ makes laws for the country." },
     { word: "definitely", hint: "I will ___ be there on time." },
-    { word: "immediately", hint: "Come here ___ \u2014 don't wait!" },
+    { word: "immediately", hint: "Come here ___ — don't wait!" },
     { word: "appreciate", hint: "I really ___ your help with my homework." },
     { word: "competition", hint: "She entered a swimming ___ and won a medal." },
     { word: "dictionary", hint: "Look up the word in the ___ if you don't know it." },
@@ -643,7 +537,7 @@ const WORDS = {
     { word: "recognise", hint: "I didn't ___ her with her new haircut." },
     { word: "secretary", hint: "The school ___ answered the phone." },
     { word: "communicate", hint: "It's important to ___ clearly with your team." },
-    { word: "exaggerate", hint: "Don't ___ \u2014 it wasn't THAT scary!" },
+    { word: "exaggerate", hint: "Don't ___ — it wasn't THAT scary!" },
     { word: "individual", hint: "Every ___ person has different fingerprints." },
     { word: "possession", hint: "His most treasured ___ was his grandfather's watch." },
     { word: "restaurant", hint: "The new ___ on Main Street serves amazing pasta." },
@@ -678,181 +572,11 @@ const WORDS = {
   ]
 };
 
-// ===== MATHS QUESTION GENERATORS =====
-function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-const MATHS = {
-  1: [
-    // Single-digit addition (warm-up, low frequency ~9%)
-    () => { const a=rand(2,9),b=rand(2,9); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers together" }; },
-    // 2-digit addition
-    () => { const a=rand(10,50),b=rand(10,40); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
-    () => { const a=rand(15,60),b=rand(5,30); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
-    // 2-digit subtraction
-    () => { const a=rand(20,60),b=rand(5,a-3); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
-    () => { const a=rand(30,80),b=rand(10,a-5); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
-    // Missing number (2-digit range)
-    () => { const total=rand(15,50),a=rand(5,total-5); return { question:`${a} + ? = ${total}`, answer:String(total-a), hint:"What number goes in the gap to make "+total+"?" }; },
-    // x2 tables with block array visual
-    () => { const b=rand(2,10); return { question:`2 \u00d7 ${b} = ?`, answer:String(2*b), hint:"2 times table", visual:'<div class="nb-sm">'+makeMultiplicationVisual(2,b)+'</div>' }; },
-    // x5 tables with block array visual
-    () => { const b=rand(2,10); return { question:`5 \u00d7 ${b} = ?`, answer:String(5*b), hint:"5 times table", visual:'<div class="nb-sm">'+makeMultiplicationVisual(5,b)+'</div>' }; },
-    // Counting pattern
-    () => { const step=pick([2,5,10]),start=step*rand(1,4); return { question:`${start}, ${start+step}, ${start+step*2}, ?`, answer:String(start+step*3), hint:"Count in "+step+"s \u2014 what comes next?" }; },
-    // Word problem (addition)
-    () => { const a=rand(15,45),b=rand(10,30); return { question:`You have ${a} stickers. Your friend gives you ${b} more. How many now?`, answer:String(a+b), hint:"This is an addition problem" }; },
-    // Word problem (multiplication)
-    () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} sweets in each. How many sweets?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
-    // Clock reading ‚Äî o'clock and half past
-    () => { const h=rand(1,12),m=pick([0,30]); return { question:'What time is it?', answer:formatClockAnswer(h,m), hint:m===0?"The minute hand points to 12":"The minute hand points to 6", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
-  ],
-  2: [
-    () => { const a=rand(10,60),b=rand(10,40); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
-    () => { const a=rand(40,99),b=rand(10,a-1); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Subtract the second from the first" }; },
-    () => { const t=pick([2,3,4,5,10]),b=rand(2,10); return { question:`${t} \u00d7 ${b} = ?`, answer:String(t*b), hint:t+" times table" }; },
-    () => { const t=pick([2,3,4,5,10]),b=rand(2,10); return { question:`${b} \u00d7 ${t} = ?`, answer:String(t*b), hint:t+" times table" }; },
-    () => { const t=pick([2,3,4,5,10]),b=rand(2,10),p=t*b; return { question:`${p} \u00f7 ${t} = ?`, answer:String(b), hint:"How many "+t+"s in "+p+"?" }; },
-    () => { const a=rand(15,45),b=rand(10,30); return { question:`You have ${a} stickers. Your friend gives you ${b} more. How many now?`, answer:String(a+b), hint:"This is an addition problem" }; },
-    () => { const a=rand(40,80),b=rand(10,a-5); return { question:`There are ${a} biscuits. You eat ${b}. How many are left?`, answer:String(a-b), hint:"This is a subtraction problem" }; },
-    () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} apples in each. How many apples?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
-    // Clock reading ‚Äî o'clock, half past, quarter past/to
-    () => { const h=rand(1,12),m=pick([0,15,30,45]); return { question:'What time is it?', answer:formatClockAnswer(h,m), hint:"Read the hour hand first, then the minute hand", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
-  ],
-  3: [
-    // 2-digit addition (mental maths, not pencil-and-paper)
-    () => { const a=rand(50,200),b=rand(30,150); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the numbers mentally" }; },
-    // 2-digit subtraction
-    () => { const a=rand(60,200),b=rand(20,a-10); return { question:`${a} \u2212 ${b} = ?`, answer:String(a-b), hint:"Subtract \u2014 try counting up from the smaller number" }; },
-    // Times tables (up to 12x12)
-    () => { const a=rand(2,12),b=rand(2,12); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Times tables" }; },
-    // Times tables reversed
-    () => { const a=rand(3,12),b=rand(2,12); return { question:`${b} \u00d7 ${a} = ?`, answer:String(a*b), hint:"Times tables" }; },
-    // Division (clean)
-    () => { const a=rand(2,12),b=rand(2,10),p=a*b; return { question:`${p} \u00f7 ${a} = ?`, answer:String(b), hint:"Division \u2014 how many "+a+"s in "+p+"?" }; },
-    // Division with remainder
-    () => { const a=rand(2,9),q=rand(3,10),r=rand(1,a-1),p=a*q+r; return { question:`${p} \u00f7 ${a} = ? remainder ?`, answer:q+" r "+r, hint:"Divide and find the remainder", acceptAlt:[q+" remainder "+r, q+"r"+r, q+" R "+r] }; },
-    // 10% of N
-    () => { const n=rand(2,20)*10; return { question:`10% of ${n} = ?`, answer:String(n/10), hint:"Divide by 10" }; },
-    // 25% or 50% of N
-    () => { const pct=pick([25,50]); const div=pct===25?4:2; const n=rand(2,20)*div; return { question:`${pct}% of ${n} = ?`, answer:String(n/div), hint:"Divide by "+div }; },
-    // Fractions (half and quarter)
-    () => { const d=pick([2,4]); const n=rand(4,20)*d; return { question:`What is ${d===2?'\u00bd':'\u00bc'} of ${n}?`, answer:String(n/d), hint:"Divide by "+d }; },
-    // Word problem ‚Äî multiplication
-    () => { const a=rand(3,9),b=rand(4,12); return { question:`${a} rows with ${b} seats in each row. How many seats?`, answer:String(a*b), hint:"Multiplication word problem" }; },
-    // Word problem ‚Äî division (fixed, no fallback bug)
-    () => { const groups=pick([3,4,5,6]),per=rand(3,8),total=groups*per; return { question:`${total} sweets shared equally among ${groups} children. How many each?`, answer:String(per), hint:"Division word problem" }; },
-    // Word problem ‚Äî multi-step (money)
-    () => { const price=rand(3,12),qty=rand(2,5),budget=price*qty+rand(2,15); const change=budget-price*qty; return { question:`You buy ${qty} books at \u20ac${price} each. You pay with \u20ac${budget}. What change?`, answer:String(change), hint:"Find total cost, then subtract from what you paid" }; },
-    // Clock reading ‚Äî 5-minute intervals
-    () => { const h=rand(1,12),m=pick([0,5,10,15,20,25,30,35,40,45,50,55]); return { question:'What time is shown?', answer:formatClockAnswer(h,m), hint:"Read the hour hand first, then count the minutes in 5s", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
-  ],
-  4: [
-    () => { const a=rand(12,35),b=rand(11,25); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Break it into parts: "+a+" \u00d7 "+Math.floor(b/10)*10+" and "+a+" \u00d7 "+(b%10) }; },
-    () => { const a=rand(15,50),b=rand(12,20); return { question:`${a} \u00d7 ${b} = ?`, answer:String(a*b), hint:"Long multiplication" }; },
-    () => { const d=rand(4,12),q=rand(10,25),p=d*q; return { question:`${p} \u00f7 ${d} = ?`, answer:String(q), hint:"Long division" }; },
-    () => { const d=pick([4,5,6,8]),a=rand(1,d-2),b=rand(1,d-a-1); return { question:`${a}/${d} + ${b}/${d} = ?`, answer:(a+b)+"/"+d, hint:"Add the tops, keep the bottom", acceptAlt:[String(((a+b)/d).toFixed(4).replace(/\.?0+$/,''))] }; },
-    () => { const a=(rand(10,90)/10),b=(rand(10,90)/10); const s=Math.round((a+b)*10)/10; return { question:`${a.toFixed(1)} + ${b.toFixed(1)} = ?`, answer:String(s), hint:"Add the decimals" }; },
-    () => { let a=(rand(40,99)/10),b=(rand(10,Math.floor(a*10)-5)/10); const s=Math.round((a-b)*10)/10; return { question:`${a.toFixed(1)} \u2212 ${b.toFixed(1)} = ?`, answer:String(s), hint:"Subtract the decimals" }; },
-    () => { const n=rand(2,20)*10; return { question:`10% of ${n} = ?`, answer:String(n/10), hint:"Divide by 10" }; },
-    () => { const n=rand(2,20)*4; return { question:`25% of ${n} = ?`, answer:String(n/4), hint:"Divide by 4" }; },
-    () => { const n=rand(2,20)*2; return { question:`50% of ${n} = ?`, answer:String(n/2), hint:"Divide by 2" }; },
-    () => { const price=rand(3,15),qty=rand(4,12),paid=price*qty+rand(5,20); const change=paid-price*qty; return { question:`You buy ${qty} pencils at \u20ac${price} each. You pay \u20ac${paid}. What change?`, answer:String(change), hint:"Find total cost, then subtract from what you paid" }; },
-    () => { const a=rand(100,400),b=rand(100,300),c=rand(50,200); return { question:`${a} + ${b} \u2212 ${c} = ?`, answer:String(a+b-c), hint:"Add first, then subtract" }; },
-  ],
-  5: [
-    () => { const pairs=[[2,3],[3,4],[2,5],[3,5],[4,5],[2,7],[3,8]]; const [d1,d2]=pick(pairs); const a=rand(1,d1-1),b=rand(1,d2-1); const lcd=d1*d2; const num=a*d2+b*d1; const g=gcd(num,lcd); return { question:`${a}/${d1} + ${b}/${d2} = ?`, answer:(num/g)+"/"+(lcd/g), hint:"Find a common denominator: "+(lcd), acceptAlt:[String((num/lcd).toFixed(4).replace(/\.?0+$/,''))] }; },
-    () => { const a=rand(1,5),b=rand(2,6),c=rand(1,5),d=rand(2,6); const num=a*c,den=b*d; const g=gcd(num,den); return { question:`${a}/${b} \u00d7 ${c}/${d} = ?`, answer:(num/g)+"/"+(den/g), hint:"Multiply tops, multiply bottoms, then simplify", acceptAlt:[String((num/den).toFixed(4).replace(/\.?0+$/,''))] }; },
-    () => { const a=rand(11,35)/10,b=rand(11,25)/10; const r=Math.round(a*b*100)/100; return { question:`${a.toFixed(1)} \u00d7 ${b.toFixed(1)} = ?`, answer:String(r), hint:"Multiply, then place the decimal point" }; },
-    () => { const pct=pick([5,10,15,20,25,30,40,50,75]),n=rand(2,20)*pick([4,10,20]); return { question:`${pct}% of ${n} = ?`, answer:String(pct*n/100), hint:"Find "+pct+"% \u2014 try breaking it into 10% and 1% steps" }; },
-    () => { const a=rand(2,8),b=rand(2,6),c=rand(1,10); return { question:`${a} \u00d7 ${b} + ${c} = ?`, answer:String(a*b+c), hint:"Multiply first, then add (BIMDAS)" }; },
-    () => { const a=rand(10,30),b=rand(2,5),c=rand(2,5); return { question:`${a} \u2212 ${b} \u00d7 ${c} = ?`, answer:String(a-b*c), hint:"Multiply first, then subtract (BIMDAS)" }; },
-    () => { const a=rand(2,6),b=rand(2,6),c=rand(1,5); return { question:`(${a} + ${b}) \u00d7 ${c} = ?`, answer:String((a+b)*c), hint:"Brackets first! (BIMDAS)" }; },
-    () => { const each=rand(3,12),qty=rand(5,15),discount=rand(5,20); const total=each*qty-discount; return { question:`${qty} tickets at \u20ac${each} each, minus \u20ac${discount} discount. Total cost?`, answer:String(total), hint:"Multiply first, then subtract the discount" }; },
-    () => { const km=rand(100,400),litres=rand(20,50); const kpl=Math.round(km/litres*10)/10; return { question:`A car drives ${km}km using ${litres} litres. How many km per litre? (1 decimal)`, answer:String(kpl), hint:"Divide distance by litres" }; },
-  ]
-};
-
-function gcd(a,b) { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b];} return a; }
-
-// ===== TEDDY QUESTION GENERATORS =====
-const TEDDY_ITEMS = [
-  { emoji: '\uD83C\uDF4E', name: 'apple', plural: 'apples' },
-  { emoji: '\u2B50', name: 'star', plural: 'stars' },
-  { emoji: '\uD83C\uDF1F', name: 'star', plural: 'stars' },
-  { emoji: '\uD83D\uDC3B', name: 'bear', plural: 'bears' },
-  { emoji: '\uD83C\uDF52', name: 'cherry', plural: 'cherries' },
-  { emoji: '\uD83C\uDF53', name: 'strawberry', plural: 'strawberries' },
-  { emoji: '\uD83C\uDF40', name: 'clover', plural: 'clovers' },
-  { emoji: '\uD83D\uDC1F', name: 'fish', plural: 'fish' },
-  { emoji: '\uD83C\uDF38', name: 'flower', plural: 'flowers' },
-  { emoji: '\uD83E\uDD8B', name: 'butterfly', plural: 'butterflies' },
-];
-
-const TEDDY_COLOURS = {
-  1: [
-    { emoji: '\uD83D\uDD34', name: 'Red', objects: ['\uD83C\uDF4E','\uD83C\uDF53','\uD83E\uDDE8','\uD83C\uDF39'] },
-    { emoji: '\uD83D\uDD35', name: 'Blue', objects: ['\uD83D\uDC33','\uD83E\uDDCA','\uD83D\uDC0B','\uD83E\uDDD9'] },
-    { emoji: '\uD83D\uDFE2', name: 'Green', objects: ['\uD83C\uDF32','\uD83D\uDC38','\uD83E\uDD66','\uD83C\uDF40'] },
-    { emoji: '\uD83D\uDFE1', name: 'Yellow', objects: ['\uD83C\uDF1F','\uD83C\uDF3B','\uD83C\uDF4C','\uD83D\uDC24'] },
-  ],
-  2: [
-    { emoji: '\uD83D\uDD34', name: 'Red', objects: ['\uD83C\uDF4E','\uD83C\uDF53','\uD83E\uDDE8','\uD83C\uDF39'] },
-    { emoji: '\uD83D\uDD35', name: 'Blue', objects: ['\uD83D\uDC33','\uD83E\uDDCA','\uD83D\uDC0B','\uD83E\uDDD9'] },
-    { emoji: '\uD83D\uDFE2', name: 'Green', objects: ['\uD83C\uDF32','\uD83D\uDC38','\uD83E\uDD66','\uD83C\uDF40'] },
-    { emoji: '\uD83D\uDFE1', name: 'Yellow', objects: ['\uD83C\uDF1F','\uD83C\uDF3B','\uD83C\uDF4C','\uD83D\uDC24'] },
-    { emoji: '\uD83D\uDFE0', name: 'Orange', objects: ['\uD83C\uDF4A','\uD83E\uDD8A','\uD83C\uDF83','\uD83E\uDD55'] },
-    { emoji: '\uD83D\uDFE3', name: 'Purple', objects: ['\uD83C\uDF47','\uD83C\uDF46','\uD83E\uDDDE','\uD83E\uDE84'] },
-    { emoji: '\uD83D\uDFE4', name: 'Brown', objects: ['\uD83D\uDC3B','\uD83C\uDF30','\uD83E\uDD65','\uD83C\uDFC8'] },
-  ],
-  3: [
-    { emoji: '\uD83D\uDD34', name: 'Red', objects: ['\uD83C\uDF4E','\uD83C\uDF53','\uD83E\uDDE8','\uD83C\uDF39'] },
-    { emoji: '\uD83D\uDD35', name: 'Blue', objects: ['\uD83D\uDC33','\uD83E\uDDCA','\uD83D\uDC0B','\uD83E\uDDD9'] },
-    { emoji: '\uD83D\uDFE2', name: 'Green', objects: ['\uD83C\uDF32','\uD83D\uDC38','\uD83E\uDD66','\uD83C\uDF40'] },
-    { emoji: '\uD83D\uDFE1', name: 'Yellow', objects: ['\uD83C\uDF1F','\uD83C\uDF3B','\uD83C\uDF4C','\uD83D\uDC24'] },
-    { emoji: '\uD83D\uDFE0', name: 'Orange', objects: ['\uD83C\uDF4A','\uD83E\uDD8A','\uD83C\uDF83','\uD83E\uDD55'] },
-    { emoji: '\uD83D\uDFE3', name: 'Purple', objects: ['\uD83C\uDF47','\uD83C\uDF46','\uD83E\uDDDE','\uD83E\uDE84'] },
-    { emoji: '\uD83D\uDFE4', name: 'Brown', objects: ['\uD83D\uDC3B','\uD83C\uDF30','\uD83E\uDD65','\uD83C\uDFC8'] },
-    { emoji: '\u26AB', name: 'Black', objects: ['\uD83D\uDDA4','\uD83C\uDF11','\uD83D\uDC08\u200D\u2B1B','\u265F\uFE0F'] },
-    { emoji: '\u26AA', name: 'White', objects: ['\u2744\uFE0F','\u2601\uFE0F','\uD83E\uDD8E','\uD83E\uDDAC'] },
-  ]
-};
-
-const TEDDY_SHAPES = {
-  1: [
-    { emoji: '\u2B55', name: 'Circle', objects: ['\u23F0','\uD83C\uDF6A','\uD83C\uDFC0','\uD83C\uDF55'] },
-    { emoji: '\uD83D\uDFE5', name: 'Square', objects: ['\uD83D\uDCFA','\uD83E\uDDF1','\uD83D\uDDBC\uFE0F','\uD83C\uDFAC'] },
-    { emoji: '\uD83D\uDD3A', name: 'Triangle', objects: ['\uD83C\uDF55','\u26FA','\uD83C\uDFF4\u200D\u2620\uFE0F','\uD83C\uDF84'] },
-  ],
-  2: [
-    { emoji: '\u2B55', name: 'Circle', objects: ['\u23F0','\uD83C\uDF6A','\uD83C\uDFC0','\uD83C\uDF55'] },
-    { emoji: '\uD83D\uDFE5', name: 'Square', objects: ['\uD83D\uDCFA','\uD83E\uDDF1','\uD83D\uDDBC\uFE0F','\uD83C\uDFAC'] },
-    { emoji: '\uD83D\uDD3A', name: 'Triangle', objects: ['\u26FA','\uD83C\uDF84','\uD83D\uDEA9','\uD83D\uDD14'] },
-    { emoji: '\u2B1C', name: 'Rectangle', objects: ['\uD83D\uDCF1','\uD83D\uDCE6','\uD83D\uDEAA','\uD83D\uDCCB'] },
-    { emoji: '\u2B50', name: 'Star', objects: ['\uD83C\uDF1F','\u2B50','\uD83C\uDF20','\uD83E\uDE85'] },
-    { emoji: '\u2764\uFE0F', name: 'Heart', objects: ['\uD83D\uDC95','\uD83D\uDC98','\uD83C\uDF08','\uD83E\uDE77'] },
-  ],
-  3: [
-    { emoji: '\u2B55', name: 'Circle', objects: ['\u23F0','\uD83C\uDF6A','\uD83C\uDFC0','\uD83C\uDF55'] },
-    { emoji: '\uD83D\uDFE5', name: 'Square', objects: ['\uD83D\uDCFA','\uD83E\uDDF1','\uD83D\uDDBC\uFE0F','\uD83C\uDFAC'] },
-    { emoji: '\uD83D\uDD3A', name: 'Triangle', objects: ['\u26FA','\uD83C\uDF84','\uD83D\uDEA9','\uD83D\uDD14'] },
-    { emoji: '\u2B1C', name: 'Rectangle', objects: ['\uD83D\uDCF1','\uD83D\uDCE6','\uD83D\uDEAA','\uD83D\uDCCB'] },
-    { emoji: '\u2B50', name: 'Star', objects: ['\uD83C\uDF1F','\u2B50','\uD83C\uDF20','\uD83E\uDE85'] },
-    { emoji: '\u2764\uFE0F', name: 'Heart', objects: ['\uD83D\uDC95','\uD83D\uDC98','\uD83C\uDF08','\uD83E\uDE77'] },
-    { emoji: '\uD83D\uDD37', name: 'Diamond', objects: ['\uD83D\uDC8E','\u2666\uFE0F','\uD83C\uDCCF','\uD83E\uDE81'] },
-  ]
-};
-
-// Jolly Phonics order ‚Äî sounds first
-const TEDDY_LETTERS = {
-  2: ['s','a','t','i','p','n'],
-  3: ['s','a','t','i','p','n','c','k','e','h','r','m','d'],
-};
-
-// Phoneme pronunciations for TTS
-const PHONEMES = {
-  s:'sss', a:'ah', t:'tuh', i:'ih', p:'puh', n:'nnn',
-  c:'kuh', k:'kuh', e:'eh', h:'huh', r:'rrr', m:'mmm', d:'duh'
+// ---- shared visual builders (Numberblocks + clocks) ----
+const NB_COLOURS = {
+  1:'#EE4035', 2:'#F37921', 3:'#FCE51B', 4:'#27AE60', 5:'#2D9CDB',
+  6:'#7B61FF', 7:'linear-gradient(135deg,#EE4035,#F37921,#FCE51B,#27AE60,#2D9CDB,#7B61FF)',
+  8:'#E91E8E', 9:'#1A5276', 10:'#DAA520'
 };
 
 function shuffleArray(arr) {
@@ -880,19 +604,10 @@ function makeNumberDistractors(correct, min, max, count) {
   return shuffleArray(options.map(String));
 }
 
-// "5 and a bit" layout for counting (Numberblocks principle)
 function makeCountVisual(count, emoji) {
   if (count <= 5) return (emoji + ' ').repeat(count).trim();
-  // Show group of 5, then remainder
   return (emoji + ' ').repeat(5).trim() + '  ' + (emoji + ' ').repeat(count - 5).trim();
 }
-
-// ===== NUMBERBLOCKS VISUALS =====
-const NB_COLOURS = {
-  1:'#EE4035', 2:'#F37921', 3:'#FCE51B', 4:'#27AE60', 5:'#2D9CDB',
-  6:'#7B61FF', 7:'linear-gradient(135deg,#EE4035,#F37921,#FCE51B,#27AE60,#2D9CDB,#7B61FF)',
-  8:'#E91E8E', 9:'#1A5276', 10:'#DAA520'
-};
 
 function makeBlockTower(n, showLabel) {
   if (showLabel === undefined) showLabel = true;
@@ -915,23 +630,15 @@ function makeBlockArray(rows, cols) {
 }
 
 function makeAdditionVisual(a, b) {
-  return '<div class="nb-sum">' +
-    makeBlockTower(a) +
-    '<span class="nb-op">+</span>' +
-    makeBlockTower(b) +
-    '<span class="nb-op">=</span>' +
-    '<span class="nb-op">?</span>' +
-    '</div>';
+  return '<div class="nb-sum">' + makeBlockTower(a) + '<span class="nb-op">+</span>' + makeBlockTower(b) +
+    '<span class="nb-op">=</span><span class="nb-op">?</span></div>';
 }
 
 function makeMultiplicationVisual(a, b) {
-  return '<div style="text-align:center">' +
-    makeBlockArray(a, b) +
-    '<div class="nb-array-label">' + a + ' \u00d7 ' + b + '</div>' +
-    '</div>';
+  return '<div style="text-align:center">' + makeBlockArray(a, b) +
+    '<div class="nb-array-label">' + a + ' × ' + b + '</div></div>';
 }
 
-// ===== CLOCK FACE VISUALS =====
 function makeClockFace(hour, minute) {
   var h = hour % 12;
   var mAngle = minute * 6;
@@ -944,13 +651,13 @@ function makeClockFace(hour, minute) {
   for (var i = 1; i <= 12; i++) {
     var a = (i * 30 - 90) * Math.PI / 180;
     var nx = 50 + 40 * Math.cos(a), ny = 50 + 40 * Math.sin(a);
-    nums += '<text x="'+nx+'" y="'+ny+'" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#334155">'+i+'</text>';
+    nums += '<text x="'+nx+'" y="'+ny+'" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#202124">'+i+'</text>';
   }
-  return '<svg viewBox="0 0 100 100" width="120" height="120" style="background:white;border-radius:50%;border:3px solid #334155">' +
+  return '<svg viewBox="0 0 100 100" width="120" height="120" style="background:white;border-radius:50%;border:3px solid #202124">' +
     '<circle cx="50" cy="50" r="48" fill="white"/>' + nums +
-    '<line x1="50" y1="50" x2="'+hx+'" y2="'+hy+'" stroke="#334155" stroke-width="4" stroke-linecap="round"/>' +
-    '<line x1="50" y1="50" x2="'+mx+'" y2="'+my+'" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>' +
-    '<circle cx="50" cy="50" r="3" fill="#334155"/></svg>';
+    '<line x1="50" y1="50" x2="'+hx+'" y2="'+hy+'" stroke="#202124" stroke-width="4" stroke-linecap="round"/>' +
+    '<line x1="50" y1="50" x2="'+mx+'" y2="'+my+'" stroke="#1a73e8" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<circle cx="50" cy="50" r="3" fill="#202124"/></svg>';
 }
 
 function formatClockAnswer(hour, minute) {
@@ -972,72 +679,293 @@ function makeClockAlts(hour, minute) {
   if (minute === 15) alts.push('15 past ' + h12);
   if (minute === 30) alts.push('30 past ' + h12);
   if (minute === 45) { var next = (h12 % 12) + 1; alts.push('15 to ' + next, '45 past ' + h12); }
-  if (minute > 30 && minute !== 45) { var next = (h12 % 12) + 1; alts.push((60 - minute) + ' to ' + next); }
+  if (minute > 30 && minute !== 45) { var next2 = (h12 % 12) + 1; alts.push((60 - minute) + ' to ' + next2); }
   return alts;
 }
 
-const TEDDY_Q = {
+// =====================================================================
+// MATHS TOPIC REGISTRY — the knowledge graph
+// Each topic: id, band (1-5), name, emoji, fam (fluency family),
+// prereqs (need strength>=2 to unlock), enc (implicit-credit weights), gens
+// fams: facts | mental | written | word | visual
+// =====================================================================
+const TOPICS = [
+  // ---------- BAND 1 ----------
+  { id:'add-1d', band:1, name:'Quick adding', emoji:'➕', fam:'facts', prereqs:[], enc:{}, gens:[
+    () => { const a=rand(2,9),b=rand(2,9); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers together" }; },
+  ]},
+  { id:'doubles', band:1, name:'Doubles & halves', emoji:'👯', fam:'facts', prereqs:['add-1d'], enc:{'add-1d':0.5}, gens:[
+    () => { const n=rand(2,15); return { question:`Double ${n} = ?`, answer:String(2*n), hint:"Add the number to itself" }; },
+    () => { const n=rand(2,15)*2; return { question:`Half of ${n} = ?`, answer:String(n/2), hint:"Split it into two equal parts" }; },
+  ]},
+  { id:'add-2d', band:1, name:'Adding bigger numbers', emoji:'➕', fam:'mental', prereqs:['add-1d'], enc:{'add-1d':0.7}, gens:[
+    () => { const a=rand(10,50),b=rand(10,40); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
+    () => { const a=rand(15,60),b=rand(5,30); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
+  ]},
+  { id:'sub-2d', band:1, name:'Taking away', emoji:'➖', fam:'mental', prereqs:['add-2d'], enc:{'add-1d':0.5}, gens:[
+    () => { const a=rand(20,60),b=rand(5,a-3); return { question:`${a} − ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
+    () => { const a=rand(30,80),b=rand(10,a-5); return { question:`${a} − ${b} = ?`, answer:String(a-b), hint:"Take the second number away from the first" }; },
+  ]},
+  { id:'missing-num', band:1, name:'Missing numbers', emoji:'🔍', fam:'mental', prereqs:['sub-2d'], enc:{'sub-2d':0.7}, gens:[
+    () => { const total=rand(15,50),a=rand(5,total-5); return { question:`${a} + ? = ${total}`, answer:String(total-a), hint:"What number goes in the gap to make "+total+"?" }; },
+  ]},
+  { id:'times-2', band:1, name:'2 times table', emoji:'✖️', fam:'facts', prereqs:['add-1d'], enc:{}, gens:[
+    () => { const b=rand(2,10); return { question:`2 × ${b} = ?`, answer:String(2*b), hint:"2 times table", visual:'<div class="nb-sm">'+makeMultiplicationVisual(2,b)+'</div>' }; },
+  ]},
+  { id:'times-5', band:1, name:'5 times table', emoji:'✖️', fam:'facts', prereqs:['add-1d'], enc:{}, gens:[
+    () => { const b=rand(2,10); return { question:`5 × ${b} = ?`, answer:String(5*b), hint:"5 times table", visual:'<div class="nb-sm">'+makeMultiplicationVisual(5,b)+'</div>' }; },
+  ]},
+  { id:'pattern', band:1, name:'Number patterns', emoji:'🔢', fam:'mental', prereqs:['add-1d'], enc:{}, gens:[
+    () => { const step=pick([2,5,10]),start=step*rand(1,4); return { question:`${start}, ${start+step}, ${start+step*2}, ?`, answer:String(start+step*3), hint:"Count in "+step+"s — what comes next?" }; },
+  ]},
+  { id:'word-1', band:1, name:'Story sums', emoji:'📖', fam:'word', prereqs:['add-2d','times-2'], enc:{'add-2d':0.5,'times-2':0.3}, gens:[
+    () => { const a=rand(15,45),b=rand(10,30); return { question:`You have ${a} stickers. Your friend gives you ${b} more. How many now?`, answer:String(a+b), hint:"This is an addition problem" }; },
+    () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} sweets in each. How many sweets?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
+  ]},
+  { id:'clock-1', band:1, name:"O'clock & half past", emoji:'🕐', fam:'visual', prereqs:[], enc:{}, gens:[
+    () => { const h=rand(1,12),m=pick([0,30]); return { question:'What time is it?', answer:formatClockAnswer(h,m), hint:m===0?"The minute hand points to 12":"The minute hand points to 6", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
+  ]},
+
+  // ---------- BAND 2 ----------
+  { id:'add-sub-2', band:2, name:'Add & subtract', emoji:'🧮', fam:'mental', prereqs:['add-2d','sub-2d'], enc:{'add-2d':0.7,'sub-2d':0.7}, gens:[
+    () => { const a=rand(10,60),b=rand(10,40); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the two numbers" }; },
+    () => { const a=rand(40,99),b=rand(10,a-1); return { question:`${a} − ${b} = ?`, answer:String(a-b), hint:"Subtract the second from the first" }; },
+  ]},
+  { id:'times-tables', band:2, name:'Times tables (2–10)', emoji:'✖️', fam:'facts', prereqs:['times-2','times-5'], enc:{'times-2':0.7,'times-5':0.7}, gens:[
+    () => { const t=pick([2,3,4,5,10]),b=rand(2,10); return { question:`${t} × ${b} = ?`, answer:String(t*b), hint:t+" times table" }; },
+    () => { const t=pick([2,3,4,5,10]),b=rand(2,10); return { question:`${b} × ${t} = ?`, answer:String(t*b), hint:t+" times table" }; },
+  ]},
+  { id:'division-intro', band:2, name:'Sharing (division)', emoji:'➗', fam:'facts', prereqs:['times-tables'], enc:{'times-tables':0.7}, gens:[
+    () => { const t=pick([2,3,4,5,10]),b=rand(2,10),p=t*b; return { question:`${p} ÷ ${t} = ?`, answer:String(b), hint:"How many "+t+"s in "+p+"?" }; },
+  ]},
+  { id:'place-value', band:2, name:'Place value', emoji:'🔟', fam:'mental', prereqs:['add-sub-2'], enc:{}, gens:[
+    () => { const h=rand(1,9),t=rand(1,9),u=rand(1,9); const n=h*100+t*10+u; const which=pick(['h','t','u']); const digit=which==='h'?h:which==='t'?t:u; const val=which==='h'?h*100:which==='t'?t*10:u; return { question:`In ${n}, what is the ${digit} worth?`, answer:String(val), hint:"Is it in the hundreds, tens or units place?" }; },
+    () => { const h=rand(1,9),t=rand(0,9),u=rand(0,9); const n=h*100+t*10+u; return { question:`What is the tens digit of ${n}?`, answer:String(t), hint:"Hundreds, then tens, then units" }; },
+  ]},
+  { id:'money-total', band:2, name:'Money', emoji:'💶', fam:'word', prereqs:['add-sub-2'], enc:{'add-sub-2':0.7}, gens:[
+    () => { const a=rand(2,9),b=rand(1,6); return { question:`A comic costs €${a} and a snack costs €${b}. How much altogether?`, answer:String(a+b), hint:"Add the two prices" }; },
+    () => { const cost=rand(2,8),paid=pick([10,20]); return { question:`A toy costs €${cost}. You pay with €${paid}. What change?`, answer:String(paid-cost), hint:"Take the price away from what you paid" }; },
+  ]},
+  { id:'word-2', band:2, name:'Story sums 2', emoji:'📖', fam:'word', prereqs:['add-sub-2','times-tables'], enc:{'add-sub-2':0.5,'times-tables':0.5}, gens:[
+    () => { const a=rand(40,80),b=rand(10,a-5); return { question:`There are ${a} biscuits. You eat ${b}. How many are left?`, answer:String(a-b), hint:"This is a subtraction problem" }; },
+    () => { const t=pick([2,3,4,5]),b=rand(2,8); return { question:`${b} bags with ${t} apples in each. How many apples?`, answer:String(t*b), hint:"This is a multiplication problem" }; },
+  ]},
+  { id:'clock-2', band:2, name:'Quarter past & to', emoji:'🕒', fam:'visual', prereqs:['clock-1'], enc:{'clock-1':1}, gens:[
+    () => { const h=rand(1,12),m=pick([0,15,30,45]); return { question:'What time is it?', answer:formatClockAnswer(h,m), hint:"Read the hour hand first, then the minute hand", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
+  ]},
+
+  // ---------- BAND 3 ----------
+  { id:'mental-3', band:3, name:'Mental maths', emoji:'🧠', fam:'mental', prereqs:['add-sub-2'], enc:{'add-sub-2':1}, gens:[
+    () => { const a=rand(50,200),b=rand(30,150); return { question:`${a} + ${b} = ?`, answer:String(a+b), hint:"Add the numbers mentally" }; },
+    () => { const a=rand(60,200),b=rand(20,a-10); return { question:`${a} − ${b} = ?`, answer:String(a-b), hint:"Subtract — try counting up from the smaller number" }; },
+  ]},
+  { id:'times-12', band:3, name:'Times tables (to 12)', emoji:'✖️', fam:'facts', prereqs:['times-tables'], enc:{'times-tables':1}, gens:[
+    () => { const a=rand(2,12),b=rand(2,12); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Times tables" }; },
+    () => { const a=rand(3,12),b=rand(2,12); return { question:`${b} × ${a} = ?`, answer:String(a*b), hint:"Times tables" }; },
+  ]},
+  { id:'division-3', band:3, name:'Division facts', emoji:'➗', fam:'facts', prereqs:['division-intro','times-12'], enc:{'division-intro':1,'times-12':0.5}, gens:[
+    () => { const a=rand(2,12),b=rand(2,10),p=a*b; return { question:`${p} ÷ ${a} = ?`, answer:String(b), hint:"Division — how many "+a+"s in "+p+"?" }; },
+  ]},
+  { id:'div-remainder', band:3, name:'Remainders', emoji:'➗', fam:'mental', prereqs:['division-3'], enc:{'division-3':1}, gens:[
+    () => { const a=rand(2,9),q=rand(3,10),r=rand(1,a-1),p=a*q+r; return { question:`${p} ÷ ${a} = ? remainder ?`, answer:q+" r "+r, hint:"Divide and find the remainder", acceptAlt:[q+" remainder "+r, q+"r"+r, q+" R "+r] }; },
+  ]},
+  { id:'percent-basics', band:3, name:'Easy percentages', emoji:'💯', fam:'mental', prereqs:['division-3'], enc:{'division-3':0.5}, gens:[
+    () => { const n=rand(2,20)*10; return { question:`10% of ${n} = ?`, answer:String(n/10), hint:"Divide by 10" }; },
+    () => { const pct=pick([25,50]); const div=pct===25?4:2; const n=rand(2,20)*div; return { question:`${pct}% of ${n} = ?`, answer:String(n/div), hint:"Divide by "+div }; },
+  ]},
+  { id:'fractions-of', band:3, name:'Fractions of amounts', emoji:'🍕', fam:'mental', prereqs:['division-3'], enc:{'division-3':0.5}, gens:[
+    () => { const d=pick([2,4]); const n=rand(4,20)*d; return { question:`What is ${d===2?'½':'¼'} of ${n}?`, answer:String(n/d), hint:"Divide by "+d }; },
+  ]},
+  { id:'rounding', band:3, name:'Rounding', emoji:'🎯', fam:'mental', prereqs:['place-value'], enc:{'place-value':0.7}, gens:[
+    () => { const n=rand(11,99); const r=Math.round(n/10)*10; return { question:`Round ${n} to the nearest 10`, answer:String(r), hint:"Look at the units digit — 5 or more rounds up" }; },
+    () => { const n=rand(101,989); const r=Math.round(n/100)*100; return { question:`Round ${n} to the nearest 100`, answer:String(r), hint:"Look at the tens digit — 5 or more rounds up" }; },
+  ]},
+  { id:'units', band:3, name:'Measures', emoji:'📏', fam:'mental', prereqs:['mental-3'], enc:{}, gens:[
+    () => { const n=rand(2,9); return { question:`How many centimetres in ${n} metres?`, answer:String(n*100), hint:"1 metre = 100 cm" }; },
+    () => { const n=rand(2,9)*100; return { question:`How many metres is ${n} cm?`, answer:String(n/100), hint:"100 cm = 1 metre" }; },
+    () => { const n=rand(1,4); return { question:`How many minutes in ${n} hour${n>1?'s':''}?`, answer:String(n*60), hint:"1 hour = 60 minutes" }; },
+    () => { const n=rand(2,5); return { question:`How many days in ${n} weeks?`, answer:String(n*7), hint:"1 week = 7 days" }; },
+  ]},
+  { id:'word-3', band:3, name:'Story sums 3', emoji:'📖', fam:'word', prereqs:['times-12','division-3'], enc:{'times-12':0.5,'division-3':0.5}, gens:[
+    () => { const a=rand(3,9),b=rand(4,12); return { question:`${a} rows with ${b} seats in each row. How many seats?`, answer:String(a*b), hint:"Multiplication word problem" }; },
+    () => { const groups=pick([3,4,5,6]),per=rand(3,8),total=groups*per; return { question:`${total} sweets shared equally among ${groups} children. How many each?`, answer:String(per), hint:"Division word problem" }; },
+  ]},
+  { id:'word-money-3', band:3, name:'Money problems', emoji:'💶', fam:'word', prereqs:['times-12','mental-3'], enc:{'times-12':0.5,'mental-3':0.3}, gens:[
+    () => { const price=rand(3,12),qty=rand(2,5),budget=price*qty+rand(2,15); const change=budget-price*qty; return { question:`You buy ${qty} books at €${price} each. You pay with €${budget}. What change?`, answer:String(change), hint:"Find total cost, then subtract from what you paid" }; },
+  ]},
+  { id:'clock-3', band:3, name:'Telling time (5 mins)', emoji:'🕕', fam:'visual', prereqs:['clock-2'], enc:{'clock-2':1}, gens:[
+    () => { const h=rand(1,12),m=pick([0,5,10,15,20,25,30,35,40,45,50,55]); return { question:'What time is shown?', answer:formatClockAnswer(h,m), hint:"Read the hour hand first, then count the minutes in 5s", visual:makeClockFace(h,m), acceptAlt:makeClockAlts(h,m) }; },
+  ]},
+
+  // ---------- BAND 4 ----------
+  { id:'long-mult', band:4, name:'Long multiplication', emoji:'✖️', fam:'written', prereqs:['times-12','mental-3'], enc:{'times-12':1,'mental-3':0.5}, gens:[
+    () => { const a=rand(12,35),b=rand(11,25); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Break it into parts: "+a+" × "+Math.floor(b/10)*10+" and "+a+" × "+(b%10) }; },
+    () => { const a=rand(15,50),b=rand(12,20); return { question:`${a} × ${b} = ?`, answer:String(a*b), hint:"Long multiplication" }; },
+  ]},
+  { id:'long-div', band:4, name:'Long division', emoji:'➗', fam:'written', prereqs:['division-3','times-12'], enc:{'division-3':1,'times-12':0.5}, gens:[
+    () => { const d=rand(4,12),q=rand(10,25),p=d*q; return { question:`${p} ÷ ${d} = ?`, answer:String(q), hint:"Long division" }; },
+  ]},
+  { id:'frac-add-same', band:4, name:'Adding fractions', emoji:'🍕', fam:'mental', prereqs:['fractions-of'], enc:{'fractions-of':0.5}, gens:[
+    () => { const d=pick([4,5,6,8]),a=rand(1,d-2),b=rand(1,d-a-1); return { question:`${a}/${d} + ${b}/${d} = ?`, answer:(a+b)+"/"+d, hint:"Add the tops, keep the bottom", acceptAlt:[String(((a+b)/d).toFixed(4).replace(/\.?0+$/,''))] }; },
+  ]},
+  { id:'decimals-add', band:4, name:'Decimals', emoji:'🔢', fam:'mental', prereqs:['mental-3','place-value'], enc:{'mental-3':0.5,'place-value':0.3}, gens:[
+    () => { const a=(rand(10,90)/10),b=(rand(10,90)/10); const s=Math.round((a+b)*10)/10; return { question:`${a.toFixed(1)} + ${b.toFixed(1)} = ?`, answer:String(s), hint:"Add the decimals" }; },
+    () => { let a=(rand(40,99)/10),b=(rand(10,Math.floor(a*10)-5)/10); const s=Math.round((a-b)*10)/10; return { question:`${a.toFixed(1)} − ${b.toFixed(1)} = ?`, answer:String(s), hint:"Subtract the decimals" }; },
+  ]},
+  { id:'percent-4', band:4, name:'Percentages', emoji:'💯', fam:'mental', prereqs:['percent-basics'], enc:{'percent-basics':1,'division-3':0.5}, gens:[
+    () => { const n=rand(2,20)*10; return { question:`10% of ${n} = ?`, answer:String(n/10), hint:"Divide by 10" }; },
+    () => { const n=rand(2,20)*4; return { question:`25% of ${n} = ?`, answer:String(n/4), hint:"Divide by 4" }; },
+    () => { const n=rand(2,20)*2; return { question:`50% of ${n} = ?`, answer:String(n/2), hint:"Divide by 2" }; },
+  ]},
+  { id:'elapsed-time', band:4, name:'Time puzzles', emoji:'⏱️', fam:'word', prereqs:['clock-3','units'], enc:{'clock-3':0.7,'units':0.3}, gens:[
+    () => { const h=rand(1,9),m=pick([0,30]),dur=pick([30,60,90,120]); const tot=m+dur; const h2=h+Math.floor(tot/60), m2=tot%60; const hh=((h2-1)%12)+1; const mm=String(m2).padStart(2,'0'); return { question:`A film starts at ${h}:${String(m).padStart(2,'0')} and lasts ${dur} minutes. When does it end?`, answer:`${hh}:${mm}`, hint:"Add the minutes — 60 minutes makes the next hour", acceptAlt:[formatClockAnswer(hh,m2)] }; },
+  ]},
+  { id:'word-money-4', band:4, name:'Money problems 2', emoji:'💶', fam:'word', prereqs:['long-mult'], enc:{'long-mult':0.7,'mental-3':0.3}, gens:[
+    () => { const price=rand(3,15),qty=rand(4,12),paid=price*qty+rand(5,20); const change=paid-price*qty; return { question:`You buy ${qty} pencils at €${price} each. You pay €${paid}. What change?`, answer:String(change), hint:"Find total cost, then subtract from what you paid" }; },
+  ]},
+  { id:'multi-step', band:4, name:'Two-step sums', emoji:'🪜', fam:'mental', prereqs:['mental-3'], enc:{'mental-3':0.7}, gens:[
+    () => { const a=rand(100,400),b=rand(100,300),c=rand(50,200); return { question:`${a} + ${b} − ${c} = ?`, answer:String(a+b-c), hint:"Add first, then subtract" }; },
+  ]},
+
+  // ---------- BAND 5 ----------
+  { id:'frac-add-diff', band:5, name:'Fractions (mixed bottoms)', emoji:'🍕', fam:'mental', prereqs:['frac-add-same','times-12'], enc:{'frac-add-same':1,'times-12':0.5}, gens:[
+    () => { const pairs=[[2,3],[3,4],[2,5],[3,5],[4,5],[2,7],[3,8]]; const [d1,d2]=pick(pairs); const a=rand(1,d1-1),b=rand(1,d2-1); const lcd=d1*d2; const num=a*d2+b*d1; const g=gcd(num,lcd); return { question:`${a}/${d1} + ${b}/${d2} = ?`, answer:(num/g)+"/"+(lcd/g), hint:"Find a common denominator: "+(lcd), acceptAlt:[String((num/lcd).toFixed(4).replace(/\.?0+$/,''))] }; },
+  ]},
+  { id:'frac-mult', band:5, name:'Multiplying fractions', emoji:'🍕', fam:'mental', prereqs:['frac-add-same'], enc:{'frac-add-same':0.5,'times-12':0.5}, gens:[
+    () => { const a=rand(1,5),b=rand(2,6),c=rand(1,5),d=rand(2,6); const num=a*c,den=b*d; const g=gcd(num,den); return { question:`${a}/${b} × ${c}/${d} = ?`, answer:(num/g)+"/"+(den/g), hint:"Multiply tops, multiply bottoms, then simplify", acceptAlt:[String((num/den).toFixed(4).replace(/\.?0+$/,''))] }; },
+  ]},
+  { id:'dec-mult', band:5, name:'Multiplying decimals', emoji:'🔢', fam:'written', prereqs:['decimals-add','long-mult'], enc:{'long-mult':0.5,'decimals-add':0.5}, gens:[
+    () => { const a=rand(11,35)/10,b=rand(11,25)/10; const r=Math.round(a*b*100)/100; return { question:`${a.toFixed(1)} × ${b.toFixed(1)} = ?`, answer:String(r), hint:"Multiply, then place the decimal point" }; },
+  ]},
+  { id:'percent-5', band:5, name:'Tricky percentages', emoji:'💯', fam:'mental', prereqs:['percent-4'], enc:{'percent-4':1}, gens:[
+    () => { const pct=pick([5,10,15,20,25,30,40,50,75]),n=rand(2,20)*pick([4,10,20]); return { question:`${pct}% of ${n} = ?`, answer:String(pct*n/100), hint:"Find "+pct+"% — try breaking it into 10% and 1% steps" }; },
+  ]},
+  { id:'bimdas', band:5, name:'BIMDAS', emoji:'🧮', fam:'mental', prereqs:['times-12','mental-3'], enc:{'times-12':0.6,'mental-3':0.4}, gens:[
+    () => { const a=rand(2,8),b=rand(2,6),c=rand(1,10); return { question:`${a} × ${b} + ${c} = ?`, answer:String(a*b+c), hint:"Multiply first, then add (BIMDAS)" }; },
+    () => { const a=rand(10,30),b=rand(2,5),c=rand(2,5); return { question:`${a} − ${b} × ${c} = ?`, answer:String(a-b*c), hint:"Multiply first, then subtract (BIMDAS)" }; },
+    () => { const a=rand(2,6),b=rand(2,6),c=rand(1,5); return { question:`(${a} + ${b}) × ${c} = ?`, answer:String((a+b)*c), hint:"Brackets first! (BIMDAS)" }; },
+  ]},
+  { id:'word-money-5', band:5, name:'Money masters', emoji:'💶', fam:'word', prereqs:['bimdas','long-mult'], enc:{'bimdas':0.5,'long-mult':0.5}, gens:[
+    () => { const each=rand(3,12),qty=rand(5,15),discount=rand(5,20); const total=each*qty-discount; return { question:`${qty} tickets at €${each} each, minus €${discount} discount. Total cost?`, answer:String(total), hint:"Multiply first, then subtract the discount" }; },
+  ]},
+  { id:'rates', band:5, name:'Speed & rates', emoji:'🚗', fam:'word', prereqs:['long-div'], enc:{'long-div':0.7}, gens:[
+    () => { const km=rand(100,400),litres=rand(20,50); const kpl=Math.round(km/litres*10)/10; return { question:`A car drives ${km}km using ${litres} litres. How many km per litre? (1 decimal)`, answer:String(kpl), hint:"Divide distance by litres" }; },
+  ]},
+];
+const TOPIC_MAP = {};
+TOPICS.forEach(t => TOPIC_MAP[t.id] = t);
+
+// =====================================================================
+// TEDDY CONTENT (unchanged from v1)
+// =====================================================================
+const TEDDY_ITEMS = [
+  { emoji: '🍎', name: 'apple', plural: 'apples' },
+  { emoji: '⭐', name: 'star', plural: 'stars' },
+  { emoji: '🌟', name: 'star', plural: 'stars' },
+  { emoji: '🐻', name: 'bear', plural: 'bears' },
+  { emoji: '🍒', name: 'cherry', plural: 'cherries' },
+  { emoji: '🍓', name: 'strawberry', plural: 'strawberries' },
+  { emoji: '🍀', name: 'clover', plural: 'clovers' },
+  { emoji: '🐟', name: 'fish', plural: 'fish' },
+  { emoji: '🌸', name: 'flower', plural: 'flowers' },
+  { emoji: '🦋', name: 'butterfly', plural: 'butterflies' },
+];
+
+const TEDDY_COLOURS = {
   1: [
-    // Emoji counting 1-3 (keep ‚Äî Teddy likes it)
-    () => { const n=rand(1,3); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:`How many ${item.plural}?` }; },
-    // Block tower counting 1-3
-    () => { const n=rand(1,3); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'How many blocks?' }; },
-    // Simple addition with towers: 1+1, 1+2, 2+1
-    () => { const a=rand(1,2),b=rand(1,2); return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(a+b,1,4,4), answer: String(a+b), speak:`${a} plus ${b}?` }; },
-    // Colours (4 basic) ‚Äî show coloured object, tap matching colour circle
-    () => { const colours=TEDDY_COLOURS[1]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: shuffleArray(emojis), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    // Shapes (3 basic) ‚Äî show real-world shaped object, tap matching shape
-    () => { const shapes=TEDDY_SHAPES[1]; const s=pick(shapes); const allEmojis=[...shapes.map(x=>x.emoji), '\u2B1C']; const choices=makeDistractors(s.emoji, allEmojis, 4); return { prompt:'What shape is this?', visual: pick(s.objects), choices: choices, answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
-    // Number recognition 1-3
-    () => { const n=rand(1,3); const digits=['1\uFE0F\u20E3','2\uFE0F\u20E3','3\uFE0F\u20E3','4\uFE0F\u20E3']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'What number is this?' }; },
+    { emoji: '🔴', name: 'Red', objects: ['🍎','🍓','🧨','🌹'] },
+    { emoji: '🔵', name: 'Blue', objects: ['🐳','🧊','🐋','🧙'] },
+    { emoji: '🟢', name: 'Green', objects: ['🌲','🐸','🥦','🍀'] },
+    { emoji: '🟡', name: 'Yellow', objects: ['🌟','🌻','🍌','🐤'] },
   ],
   2: [
-    // Emoji counting 1-5 (keep)
+    { emoji: '🔴', name: 'Red', objects: ['🍎','🍓','🧨','🌹'] },
+    { emoji: '🔵', name: 'Blue', objects: ['🐳','🧊','🐋','🧙'] },
+    { emoji: '🟢', name: 'Green', objects: ['🌲','🐸','🥦','🍀'] },
+    { emoji: '🟡', name: 'Yellow', objects: ['🌟','🌻','🍌','🐤'] },
+    { emoji: '🟠', name: 'Orange', objects: ['🍊','🦊','🎃','🥕'] },
+    { emoji: '🟣', name: 'Purple', objects: ['🍇','🍆','🧞','🪄'] },
+    { emoji: '🟤', name: 'Brown', objects: ['🐻','🌰','🥥','🏈'] },
+  ],
+  3: [
+    { emoji: '🔴', name: 'Red', objects: ['🍎','🍓','🧨','🌹'] },
+    { emoji: '🔵', name: 'Blue', objects: ['🐳','🧊','🐋','🧙'] },
+    { emoji: '🟢', name: 'Green', objects: ['🌲','🐸','🥦','🍀'] },
+    { emoji: '🟡', name: 'Yellow', objects: ['🌟','🌻','🍌','🐤'] },
+    { emoji: '🟠', name: 'Orange', objects: ['🍊','🦊','🎃','🥕'] },
+    { emoji: '🟣', name: 'Purple', objects: ['🍇','🍆','🧞','🪄'] },
+    { emoji: '🟤', name: 'Brown', objects: ['🐻','🌰','🥥','🏈'] },
+    { emoji: '⚫', name: 'Black', objects: ['🖤','🌑','🐈‍⬛','♟️'] },
+    { emoji: '⚪', name: 'White', objects: ['❄️','☁️','🦎','🦬'] },
+  ]
+};
+
+const TEDDY_SHAPES = {
+  1: [
+    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍕'] },
+    { emoji: '🟥', name: 'Square', objects: ['📺','🧱','🖼️','🎬'] },
+    { emoji: '🔺', name: 'Triangle', objects: ['🍕','⛺','🏴‍☠️','🎄'] },
+  ],
+  2: [
+    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍕'] },
+    { emoji: '🟥', name: 'Square', objects: ['📺','🧱','🖼️','🎬'] },
+    { emoji: '🔺', name: 'Triangle', objects: ['⛺','🎄','🚩','🔔'] },
+    { emoji: '⬜', name: 'Rectangle', objects: ['📱','📦','🚪','📋'] },
+    { emoji: '⭐', name: 'Star', objects: ['🌟','⭐','🌠','🪅'] },
+    { emoji: '❤️', name: 'Heart', objects: ['💕','💘','🌈','🩷'] },
+  ],
+  3: [
+    { emoji: '⭕', name: 'Circle', objects: ['⏰','🍪','🏀','🍕'] },
+    { emoji: '🟥', name: 'Square', objects: ['📺','🧱','🖼️','🎬'] },
+    { emoji: '🔺', name: 'Triangle', objects: ['⛺','🎄','🚩','🔔'] },
+    { emoji: '⬜', name: 'Rectangle', objects: ['📱','📦','🚪','📋'] },
+    { emoji: '⭐', name: 'Star', objects: ['🌟','⭐','🌠','🪅'] },
+    { emoji: '❤️', name: 'Heart', objects: ['💕','💘','🌈','🩷'] },
+    { emoji: '🔷', name: 'Diamond', objects: ['💎','♦️','🃏','🪁'] },
+  ]
+};
+
+const TEDDY_LETTERS = {
+  2: ['s','a','t','i','p','n'],
+  3: ['s','a','t','i','p','n','c','k','e','h','r','m','d'],
+};
+
+const PHONEMES = {
+  s:'sss', a:'ah', t:'tuh', i:'ih', p:'puh', n:'nnn',
+  c:'kuh', k:'kuh', e:'eh', h:'huh', r:'rrr', m:'mmm', d:'duh'
+};
+
+const TEDDY_Q = {
+  1: [
+    () => { const n=rand(1,3); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:`How many ${item.plural}?` }; },
+    () => { const n=rand(1,3); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'How many blocks?' }; },
+    () => { const a=rand(1,2),b=rand(1,2); return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(a+b,1,4,4), answer: String(a+b), speak:`${a} plus ${b}?` }; },
+    () => { const colours=TEDDY_COLOURS[1]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: shuffleArray(emojis), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
+    () => { const shapes=TEDDY_SHAPES[1]; const s=pick(shapes); const allEmojis=[...shapes.map(x=>x.emoji), '⬜']; const choices=makeDistractors(s.emoji, allEmojis, 4); return { prompt:'What shape is this?', visual: pick(s.objects), choices: choices, answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
+    () => { const n=rand(1,3); const digits=['1️⃣','2️⃣','3️⃣','4️⃣']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,4,4), answer: String(n), speak:'What number is this?' }; },
+  ],
+  2: [
     () => { const n=rand(1,5); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:`How many ${item.plural}?` }; },
-    // Block tower counting 1-5
     () => { const n=rand(1,5); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:'How many blocks?' }; },
-    // Addition with towers
     () => { const a=rand(1,4),b=rand(1,4); const s=a+b; return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(s,1,9,4), answer: String(s), speak:`${a} plus ${b}?` }; },
-    // Colours (7) ‚Äî show coloured object, tap matching colour circle
     () => { const colours=TEDDY_COLOURS[2]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: makeDistractors(c.emoji, emojis, 4), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    // Shapes (6) ‚Äî show real-world shaped object, tap matching shape
     () => { const shapes=TEDDY_SHAPES[2]; const s=pick(shapes); const emojis=shapes.map(x=>x.emoji); return { prompt:'What shape is this?', visual: pick(s.objects), choices: makeDistractors(s.emoji, emojis, 4), answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
-    // Number recognition 1-5
-    () => { const n=rand(1,5); const digits=['1\uFE0F\u20E3','2\uFE0F\u20E3','3\uFE0F\u20E3','4\uFE0F\u20E3','5\uFE0F\u20E3']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:'What number is this?' }; },
-    // Letters Group 1: s, a, t, i, p, n ‚Äî phoneme recognition
+    () => { const n=rand(1,5); const digits=['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']; return { prompt:'What number is this?', visual: digits[n-1], choices: makeNumberDistractors(n,1,6,4), answer: String(n), speak:'What number is this?' }; },
     () => { const letters=TEDDY_LETTERS[2]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Which letter makes the "${PHONEMES[l]}" sound?`, visual: l.toUpperCase(), choices: choices, answer: l.toUpperCase(), speak:`Which letter makes the ${PHONEMES[l]} sound?` }; },
     () => { const letters=TEDDY_LETTERS[2]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Tap the letter: ${PHONEMES[l]}`, visual: '', choices: choices, answer: l.toUpperCase(), speak: PHONEMES[l] }; },
   ],
   3: [
-    // Emoji counting 1-10 with "5 and a bit" (keep)
     () => { const n=rand(1,10); const item=pick(TEDDY_ITEMS); return { prompt:`How many ${item.plural}?`, visual: makeCountVisual(n, item.emoji), choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:`How many ${item.plural}?` }; },
-    // Block tower counting 1-10
     () => { const n=rand(1,10); return { prompt:'How many blocks?', visual: makeBlockTower(n, false), visualIsHTML: true, choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:'How many blocks?' }; },
-    // Addition with towers
     () => { const a=rand(1,5),b=rand(1,5); const s=a+b; return { prompt:`${a} + ${b} = ?`, visual: makeAdditionVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(s,2,10,4), answer: String(s), speak:`${a} plus ${b}?` }; },
-    // Multiplication with arrays (2x2 to 3x4)
     () => { const a=rand(2,3),b=rand(2,4); const p=a*b; return { prompt:`${a} times ${b}?`, visual: makeMultiplicationVisual(a,b), visualIsHTML: true, choices: makeNumberDistractors(p,2,12,4), answer: String(p), speak:`${a} times ${b}?` }; },
-    // Number recognition 1-10
     () => { const n=rand(1,10); return { prompt:'What number is this?', visual: `<span style="font-size:4rem;font-weight:700">${n}</span>`, visualIsHTML: true, choices: makeNumberDistractors(n,1,10,4), answer: String(n), speak:'What number is this?' }; },
-    // Colours (full set) ‚Äî show coloured object, tap matching colour circle
     () => { const colours=TEDDY_COLOURS[3]; const c=pick(colours); const emojis=colours.map(x=>x.emoji); return { prompt:'What colour is this?', visual: pick(c.objects), choices: makeDistractors(c.emoji, emojis, 4), answer: c.emoji, speakAnswer: c.name, speak:'What colour is this?' }; },
-    // Shapes (full set) ‚Äî show real-world shaped object, tap matching shape
     () => { const shapes=TEDDY_SHAPES[3]; const s=pick(shapes); const emojis=shapes.map(x=>x.emoji); return { prompt:'What shape is this?', visual: pick(s.objects), choices: makeDistractors(s.emoji, emojis, 4), answer: s.emoji, speakAnswer: s.name, speak:'What shape is this?' }; },
-    // Letters Group 2
     () => { const letters=TEDDY_LETTERS[3]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Which letter makes the "${PHONEMES[l]}" sound?`, visual: l.toUpperCase(), choices: choices, answer: l.toUpperCase(), speak:`Which letter makes the ${PHONEMES[l]} sound?` }; },
     () => { const letters=TEDDY_LETTERS[3]; const l=pick(letters); const choices=makeDistractors(l.toUpperCase(), letters.map(x=>x.toUpperCase()), 4); return { prompt:`Tap the letter: ${PHONEMES[l]}`, visual: '', choices: choices, answer: l.toUpperCase(), speak: PHONEMES[l] }; },
-    // More / Less ‚Äî show both groups in visual area, tap the bigger number
     () => { const a=rand(1,4),b=rand(a+2,9); const itemA=pick(TEDDY_ITEMS),itemB=pick(TEDDY_ITEMS); const va=makeCountVisual(a,itemA.emoji), vb=makeCountVisual(b,itemB.emoji); const ordered=Math.random()<0.5?[itemA.emoji,itemB.emoji]:[itemB.emoji,itemA.emoji]; return { prompt:'Which group has MORE?', visual: va + '&nbsp; &nbsp;or&nbsp; &nbsp;' + vb, visualIsHTML: true, choices: ordered, answer: itemB.emoji, speak:'Which group has more?' }; },
   ]
-};
-
-// ===== TYPE TAGS (parallel to generator arrays) =====
-const MATHS_TAGS = {
-  1: ['add-1d','add-2d','add-2d','sub-2d','sub-2d','missing','times-2','times-5','pattern','word-add','word-mult','clock'],
-  2: ['add-2d','sub-2d','times','times','division','word-add','word-sub','word-mult','clock'],
-  3: ['add-mental','sub-mental','times','times','division','div-rem','pct','pct','fractions','word-mult','word-div','word-money','clock'],
-  4: ['long-mult','long-mult','long-div','frac-add','dec-add','dec-sub','pct','pct','pct','word-money','multi-step'],
-  5: ['frac-add','frac-mult','dec-mult','pct','bimdas','bimdas','bimdas','word-money','word-rate']
 };
 
 const TEDDY_TAGS = {
@@ -1046,303 +974,397 @@ const TEDDY_TAGS = {
   3: ['counting','block-count','addition','mult-array','number-recog','colours','shapes','letter-sound','letter-tap','more-less']
 };
 
-// ===== CONSTANTS =====
-const LEVEL_NAMES = ["", "Explorer", "Adventurer", "Wizard", "Champion", "Legend"];
-const LEVEL_EMOJI = ["", "\uD83C\uDF0D", "\u26C8\uFE0F", "\uD83E\uDDD9", "\uD83C\uDFC6", "\u2B50"];
-const CORRECT_MSGS = ["Brilliant!", "Nailed it!", "Perfect!", "Amazing!", "You legend!", "Spot on!", "Superb!", "Class!", "Deadly!", "Well done!"];
-const WRONG_MSGS = ["Close!", "Nearly!", "Good try!", "Almost!", "Keep going!"];
+const CORRECT_MSGS = ["Brilliant! 🎉", "Nailed it! 💪", "Perfect! ⭐", "Amazing! 🌟", "You legend! 🏆", "Spot on! 🎯", "Superb! 🚀", "Class! 👏", "Deadly! 🔥", "Well done! 🎈"];
+const WRONG_MSGS = ["Close! 🤞", "Nearly! 💪", "Good try! 🌱", "Almost! 👊", "Keep going! 🚀"];
 const TEDDY_CORRECT = ["Well done Teddy!", "Brilliant!", "You're a star!", "Amazing!", "Super!", "Yay!"];
-const TEDDY_WRONG = ["Nearly!", "Good try!", "Almost!"];
 
-// ===== ADAPTIVE SYSTEM =====
-const WINDOW_SIZE = 8;
-const LEVEL_UP_THRESHOLD = 6;   // 6 of 8 correct = 75%
-const LEVEL_DOWN_THRESHOLD = 2; // 2 of 8 correct = 25%
-const MIN_ANSWERS_FOR_DOWN = 6; // need at least 6 answers before levelling down
+// =====================================================================
+// SCHEDULER — spaced repetition on the topic graph
+// =====================================================================
+const DAY = 86400000;
+const INTERVALS = [0, 1, 3, 7, 14, 30, 60];   // days at each strength 0-6
+const FLUENT = { facts:7000, mental:15000, written:40000, word:40000, visual:15000 };
+const GOALS = { elsie:30, freya:30, teddy:10 };
+const CLASS_INFO = { elsie:'4th Class', freya:'2nd Class', teddy:'Little Explorer' };
 
-function checkAdaptive(profile, maxLevel) {
-  const recent = profile.recentAnswers || [];
-  if (recent.length < WINDOW_SIZE) return null;
-  const correct = recent.filter(Boolean).length;
-  if (correct >= LEVEL_UP_THRESHOLD && profile.level < maxLevel) {
-    return 'up';
+function todayStr(offset) {
+  const d = new Date(Date.now() + (offset||0));
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function freshDaily() { return { date:'', pts:0, streak:0, lastGoal:'', hist:{}, done:false }; }
+
+function loadChild(name) {
+  let p = null;
+  try { p = JSON.parse(localStorage.getItem('lc_' + name) || 'null'); } catch(e) {}
+  if (!p) p = migrateChild(name);
+  if (!p.daily) p.daily = freshDaily();
+  rollDaily(p);
+  return p;
+}
+
+function saveChild(p) { localStorage.setItem('lc_' + p.name, JSON.stringify(p)); }
+
+// Migrate v1 localStorage profiles (maths_<name> / spelling_<name>) — a child
+// at old level L gets everything below band L seeded as known-but-due-soon,
+// so they carry on where they were and old material returns as review.
+function migrateChild(name) {
+  const p = { v:2, name:name, topics:{}, spelling:{ band:1, words:{} }, daily:freshDaily(), score:0, streak:0, bestStreak:0 };
+  if (name === 'teddy') return p;
+  let oldM = null, oldS = null;
+  try { oldM = JSON.parse(localStorage.getItem('maths_' + name) || 'null'); } catch(e) {}
+  try { oldS = JSON.parse(localStorage.getItem('spelling_' + name) || 'null'); } catch(e) {}
+  const defaultBand = name === 'elsie' ? 3 : 1;
+  const mBand = oldM ? oldM.level : defaultBand;
+  p.spelling.band = Math.min(oldS ? oldS.level : defaultBand, 5);
+  p.score = (oldM ? oldM.score || 0 : 0) + (oldS ? oldS.score || 0 : 0);
+  p.bestStreak = Math.max(oldM ? oldM.bestStreak || 0 : 0, oldS ? oldS.bestStreak || 0 : 0);
+  TOPICS.forEach(t => {
+    if (t.band < mBand) {
+      p.topics[t.id] = { s:3, due: Date.now() + rand(0,3) * DAY, r:2, w:0, reps:2, ema:null, credit:0 };
+    }
+  });
+  return p;
+}
+
+function topicState(p, id) {
+  if (!p.topics[id]) p.topics[id] = { s:0, due:0, r:0, w:0, reps:0, ema:null, credit:0 };
+  return p.topics[id];
+}
+
+function isUnlocked(p, t) {
+  return t.prereqs.every(id => (p.topics[id] || {s:0}).s >= 2);
+}
+
+function topicStatus(p, t) {
+  const st = p.topics[t.id];
+  if (!st || st.reps === 0) return isUnlocked(p, t) ? 'new' : 'locked';
+  const n = st.r + st.w;
+  const rate = n ? st.r / n : 0;
+  if (n >= 3 && rate < 0.6) return 'shaky';
+  if (st.s >= 5) return 'mastered';
+  if (st.s >= 3) return 'solid';
+  return 'learning';
+}
+
+function weightedPick(items, weights) {
+  const total = weights.reduce((a,b) => a+b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < items.length; i++) { r -= weights[i]; if (r <= 0) return items[i]; }
+  return items[items.length - 1];
+}
+
+// Selection: in-session retries first, then due reviews, then the frontier.
+function selectMathsTopic(p) {
+  const now = Date.now();
+  for (let i = 0; i < mathsRequeue.length; i++) {
+    if (mathsRequeue[i].after <= qCount && mathsRequeue[i].id !== lastTopics[lastTopics.length-1]) {
+      return TOPIC_MAP[mathsRequeue.splice(i,1)[0].id];
+    }
   }
-  if (correct <= LEVEL_DOWN_THRESHOLD && recent.length >= MIN_ANSWERS_FOR_DOWN && profile.level > 1) {
-    return 'down';
+  const avail = TOPICS.filter(t => isUnlocked(p, t) && !lastTopics.includes(t.id));
+  const due = avail.filter(t => { const st = p.topics[t.id]; return st && st.reps > 0 && st.due <= now && st.s < 6; });
+  if (due.length) {
+    due.sort((a,b) => p.topics[a.id].due - p.topics[b.id].due);
+    return pick(due.slice(0, 3));
   }
+  let frontier = avail.filter(t => { const st = p.topics[t.id]; return !st || st.s < 2; });
+  if (frontier.length) {
+    // learn in curriculum order: only open the lowest band that still has work
+    const minBand = Math.min.apply(null, frontier.map(t => t.band));
+    frontier = frontier.filter(t => t.band <= minBand + 1);
+    const weights = frontier.map(t => {
+      const st = p.topics[t.id];
+      if (!st || st.r + st.w < 3) return 1.5;
+      const rate = st.r / (st.r + st.w);
+      return Math.max(0.3, Math.min(3, 1 / (rate + 0.1)));
+    });
+    return weightedPick(frontier, weights);
+  }
+  const all = TOPICS.filter(t => isUnlocked(p, t));
+  all.sort((a,b) => ((p.topics[a.id]||{due:0}).due) - ((p.topics[b.id]||{due:0}).due));
+  return all.find(t => !lastTopics.includes(t.id)) || all[0];
+}
+
+// Implicit credit: a correct answer on an advanced topic counts as a
+// fractional repetition on the topics inside it (Math Academy's FIRe idea).
+function applyCredit(p, t) {
+  const enc = t.enc || {};
+  Object.keys(enc).forEach(id => {
+    const est = topicState(p, id);
+    if (est.reps === 0) return;
+    est.credit = (est.credit || 0) + enc[id];
+    while (est.credit >= 1) {
+      est.credit -= 1;
+      est.r++; est.reps++;
+      est.due = Math.max(est.due, Date.now() + INTERVALS[est.s] * DAY * 0.75);
+    }
+  });
+}
+
+// Returns true if the answer was fluent (fast enough for its family)
+function gradeMathsAnswer(p, t, correct, ms) {
+  const st = topicState(p, t.id);
+  const now = Date.now();
+  st.reps++;
+  if (correct) {
+    st.r++;
+    const fluent = ms <= FLUENT[t.fam];
+    st.ema = st.ema == null ? ms : Math.round(st.ema * 0.7 + ms * 0.3);
+    let ns = st.s + 1;
+    // learned but not fluent → no progress past 2, but never demote on a correct answer
+    if (t.fam === 'facts' && !fluent) ns = Math.min(ns, Math.max(st.s, 2));
+    st.s = Math.min(ns, 6);
+    st.due = now + INTERVALS[st.s] * DAY * (0.9 + Math.random() * 0.2);
+    applyCredit(p, t);
+    if (st.s >= 5 && !st.m) { st.m = 1; showToast('🏆 Mastered: ' + t.emoji + ' ' + t.name + '!'); }
+    return fluent;
+  } else {
+    st.w++;
+    st.s = Math.max(0, st.s - 2);
+    st.due = now;
+    mathsRequeue.push({ id: t.id, after: qCount + 3 });
+    return false;
+  }
+}
+
+// ---- spelling scheduler ----
+function findWordObj(w) {
+  for (let b = 1; b <= 5; b++) { const m = WORDS[b].find(x => x.word === w); if (m) return m; }
   return null;
 }
 
-function recordAnswer(profile, isCorrect) {
-  if (!profile.recentAnswers) profile.recentAnswers = [];
-  profile.recentAnswers.push(isCorrect);
-  if (profile.recentAnswers.length > WINDOW_SIZE) {
-    profile.recentAnswers.shift();
-  }
-}
-
-// Per-type performance tracking (granular adaptive)
-function recordTypeResult(profile, level, tag, isCorrect) {
-  if (!profile.typeStats) profile.typeStats = {};
-  const key = level + ':' + tag;
-  if (!profile.typeStats[key]) profile.typeStats[key] = { right: 0, wrong: 0 };
-  const s = profile.typeStats[key];
-  if (isCorrect) s.right++; else s.wrong++;
-  // Decay: halve when history > 20 to bias toward recent performance
-  if (s.right + s.wrong > 20) {
-    s.right = Math.floor(s.right / 2);
-    s.wrong = Math.floor(s.wrong / 2);
-  }
-}
-
-// Weighted question selection: inverse-success-rate weighting
-function selectWeighted(generators, tags, profile, level, lastTags, missedTypes) {
-  const stats = profile.typeStats || {};
-  const weights = generators.map(function(gen, i) {
-    const tag = tags[i];
-    const key = level + ':' + tag;
-    const s = stats[key];
-    if (!s || (s.right + s.wrong) < 3) return 1.5; // exploration bonus
-    var rate = s.right / (s.right + s.wrong);
-    // Inverse: struggling‚Üíhigh weight, strong‚Üílow weight
-    var w = 1 / (rate + 0.1);
-    return Math.max(0.3, Math.min(3.0, w));
-  });
-  // Session missed boost
-  var missed = missedTypes || [];
-  weights.forEach(function(w, i) {
-    var count = missed.filter(function(t) { return t === tags[i]; }).length;
-    if (count > 0) weights[i] *= (1 + count * 0.5);
-  });
-  // Repeat prevention: zero-out last 2 tags (re-enabled if all zeroed)
-  if (lastTags && lastTags.length > 0) {
-    var hasNonZero = false;
-    weights.forEach(function(w, i) {
-      if (lastTags.includes(tags[i])) weights[i] = 0;
-      else if (w > 0) hasNonZero = true;
-    });
-    if (!hasNonZero) { // all zeroed ‚Äî re-enable all
-      generators.forEach(function(g, i) {
-        var tag = tags[i], key = level + ':' + tag;
-        var s = stats[key];
-        weights[i] = (!s || (s.right+s.wrong)<3) ? 1.5 : Math.max(0.3, Math.min(3.0, 1/(s.right/(s.right+s.wrong)+0.1)));
-      });
+function selectWord(p) {
+  const sp = p.spelling;
+  const now = Date.now();
+  for (let i = 0; i < spellRequeue.length; i++) {
+    if (spellRequeue[i].after <= qCount && spellRequeue[i].word !== lastWord) {
+      const w = spellRequeue.splice(i,1)[0].word;
+      const obj = findWordObj(w);
+      if (obj) return obj;
     }
   }
-  // Weighted random pick
-  var total = weights.reduce(function(a,b){return a+b;}, 0);
-  var r = Math.random() * total;
-  for (var i = 0; i < generators.length; i++) {
-    r -= weights[i];
-    if (r <= 0) return { gen: generators[i], idx: i, tag: tags[i] };
+  const due = Object.keys(sp.words).filter(w => sp.words[w].due <= now && sp.words[w].s < 6 && w !== lastWord);
+  if (due.length) {
+    due.sort((a,b) => sp.words[a].due - sp.words[b].due);
+    const obj = findWordObj(pick(due.slice(0, 4)));
+    if (obj) return obj;
   }
-  return { gen: generators[generators.length-1], idx: generators.length-1, tag: tags[tags.length-1] };
+  const bank = WORDS[sp.band];
+  const fresh = bank.filter(x => !sp.words[x.word]);
+  if (fresh.length) return pick(fresh);
+  const solid = bank.filter(x => sp.words[x.word] && sp.words[x.word].s >= 2).length;
+  if (solid >= Math.ceil(bank.length * 0.8) && sp.band < 5) {
+    sp.band++;
+    showToast('📚 New words unlocked! Band ' + sp.band + ' 🎉');
+    return pick(WORDS[sp.band]);
+  }
+  const all = Object.keys(sp.words).filter(w => w !== lastWord);
+  if (all.length) { all.sort((a,b) => sp.words[a].due - sp.words[b].due); return findWordObj(all[0]) || bank[0]; }
+  return bank[0];
 }
 
-// ===== STATE =====
+function gradeWordAnswer(p, word, correct) {
+  const sp = p.spelling;
+  if (!sp.words[word]) sp.words[word] = { s:0, due:0, r:0, w:0 };
+  const ws = sp.words[word];
+  const now = Date.now();
+  if (correct) {
+    ws.r++;
+    ws.s = Math.min(ws.s + 1, 6);
+    ws.due = now + INTERVALS[ws.s] * DAY * (0.9 + Math.random() * 0.2);
+  } else {
+    ws.w++;
+    ws.s = 0;
+    ws.due = now;
+    spellRequeue.push({ word: word, after: qCount + 3 });
+  }
+}
+
+// ---- daily loop ----
+function rollDaily(p) {
+  const t = todayStr();
+  if (p.daily.date !== t) { p.daily.date = t; p.daily.pts = 0; p.daily.done = false; }
+}
+
+function addPoints(p, n) {
+  rollDaily(p);
+  p.daily.pts += n;
+  p.daily.hist[p.daily.date] = p.daily.pts;
+  const keys = Object.keys(p.daily.hist).sort();
+  while (keys.length > 40) delete p.daily.hist[keys.shift()];
+  const goal = GOALS[p.name] || 30;
+  if (p.daily.pts >= goal && !p.daily.done) {
+    p.daily.done = true;
+    p.daily.streak = (p.daily.lastGoal === todayStr(-DAY)) ? p.daily.streak + 1 : 1;
+    p.daily.lastGoal = p.daily.date;
+    saveChild(p);
+    setTimeout(() => showDone(p), 600);
+  }
+}
+
+// =====================================================================
+// STATE + NAVIGATION
+// =====================================================================
 let currentPlayerName = null;
 let currentMode = null;
-let currentProfile = null;
+let profile = null;            // lc_<name> profile for current child
+let teddyProfile = null;       // legacy level-based profile for Teddy
 let currentQuestion = null;
-let currentQuestionTag = null;
-let lastMathTags = [];
+let currentTopic = null;
+let lastTopics = [];
+let lastWord = null;
+let mathsRequeue = [];
+let spellRequeue = [];
 let lastTeddyTags = [];
-let missedMathTypes = [];
 let missedTeddyTypes = [];
-let usedWords = [];
-let missedWords = []; // spelling: words gotten wrong, for recycling
+let qCount = 0;
+let qStart = 0;
 let waiting = false;
-let teddySessionScore = 0;
 
-function getProfile(mode, name) {
-  const key = mode + '_' + name;
-  const stored = localStorage.getItem(key);
-  if (stored) {
-    const p = JSON.parse(stored);
-    // Migration: add recentAnswers and typeStats if missing
-    if (!p.recentAnswers) p.recentAnswers = [];
-    if (!p.typeStats) p.typeStats = {};
-    return p;
-  }
-  if (name === 'teddy') {
-    return { name:'teddy', mode:'mixed', level:1, score:0, streak:0, bestStreak:0, recentAnswers:[], typeStats:{} };
-  }
-  const defaultLevel = name === 'elsie' ? 3 : 1;
-  return { name:name, mode:mode, level:defaultLevel, score:0, streak:0, bestStreak:0, recentAnswers:[], typeStats:{} };
-}
+const AVATARS = { elsie:'👑', freya:'🐱', teddy:'🧸' };
 
-function saveProfile(profile) {
-  localStorage.setItem(profile.mode + '_' + profile.name, JSON.stringify(profile));
-}
+function init() { updateProfileInfo(); }
 
-// ===== INIT =====
-function init() {
-  updateProfileInfo();
+function childSummary(name) {
+  const p = loadChild(name);
+  const goal = GOALS[name] || 30;
+  return CLASS_INFO[name] + '<br>🔥 ' + (p.daily.streak || 0) + ' · ⭐ ' + p.daily.pts + '/' + goal;
 }
 
 function updateProfileInfo() {
-  const es = getProfile('spelling','elsie'), ef = getProfile('spelling','freya');
-  document.getElementById('elsie-info').textContent = 'Spelling L' + es.level + ' \u2022 Maths L' + getProfile('maths','elsie').level;
-  document.getElementById('freya-info').textContent = 'Spelling L' + ef.level + ' \u2022 Maths L' + getProfile('maths','freya').level;
-  const tp = getProfile('mixed','teddy');
-  document.getElementById('teddy-info').textContent = '\u2B50 ' + LEVEL_NAMES[tp.level || 1];
+  document.getElementById('elsie-info').innerHTML = childSummary('elsie');
+  document.getElementById('freya-info').innerHTML = childSummary('freya');
+  document.getElementById('teddy-info').innerHTML = childSummary('teddy');
 }
 
-// ===== NAVIGATION =====
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
 function goHome() {
+  if (profile) saveChild(profile);
   updateProfileInfo();
   showScreen('screen-select');
-  currentPlayerName = null;
-  currentMode = null;
-  currentProfile = null;
-  usedWords = [];
-  missedWords = [];
-  lastMathTags = []; lastTeddyTags = [];
-  missedMathTypes = []; missedTeddyTypes = [];
+  currentPlayerName = null; currentMode = null; profile = null;
+  lastTopics = []; mathsRequeue = []; spellRequeue = []; lastWord = null;
+  lastTeddyTags = []; missedTeddyTypes = [];
 }
 
 function goModeSelect() {
+  if (profile) saveChild(profile);
   selectPlayer(currentPlayerName);
 }
 
 function selectPlayer(name) {
   currentPlayerName = name;
-
-  if (name === 'teddy') {
-    startTeddyGame();
-    return;
-  }
-
+  if (name === 'teddy') { startTeddyGame(); return; }
+  profile = loadChild(name);
   const displayName = name === 'elsie' ? 'Elsie' : 'Freya';
-  document.getElementById('mode-subtitle').textContent = displayName + "'s turn!";
-
-  const sp = getProfile('spelling', name);
-  const mp = getProfile('maths', name);
-  document.getElementById('spelling-level-info').textContent = LEVEL_NAMES[sp.level] + ' \u2022 Level ' + sp.level;
-  document.getElementById('maths-level-info').textContent = LEVEL_NAMES[mp.level] + ' \u2022 Level ' + mp.level;
-
+  document.getElementById('mode-subtitle').textContent = displayName + "'s turn! ✨";
+  const mastered = TOPICS.filter(t => (profile.topics[t.id]||{s:0}).s >= 5).length;
+  const wordsSolid = Object.keys(profile.spelling.words).filter(w => profile.spelling.words[w].s >= 3).length;
+  document.getElementById('spelling-level-info').textContent = '📚 Band ' + profile.spelling.band + ' · ' + wordsSolid + ' words solid';
+  document.getElementById('maths-level-info').textContent = '🏆 ' + mastered + '/' + TOPICS.length + ' topics mastered';
+  document.getElementById('mode-daily').innerHTML = '<div class="streak-chip">🔥 ' + (profile.daily.streak||0) + ' · ⭐ ' + profile.daily.pts + '/' + (GOALS[name]||30) + '</div>';
   showScreen('screen-mode');
 }
 
-// ===== GAME START (Elsie/Freya) =====
+// =====================================================================
+// GAME FLOW (Elsie / Freya)
+// =====================================================================
 function startGame(mode) {
   currentMode = mode;
-  currentProfile = getProfile(mode, currentPlayerName);
-  usedWords = [];
-  missedWords = [];
+  qCount = 0;
   showScreen('screen-game');
-
-  const tag = document.getElementById('player-tag');
-  tag.className = 'player-tag ' + currentPlayerName;
+  const av = document.getElementById('player-avatar');
+  av.className = 'avatar-sm av-' + currentPlayerName;
+  av.textContent = AVATARS[currentPlayerName];
   document.getElementById('player-name-tag').textContent = currentPlayerName === 'elsie' ? 'Elsie' : 'Freya';
-  document.getElementById('mode-tag-label').textContent = mode === 'spelling' ? '\uD83D\uDCDD Spelling' : '\uD83D\uDD22 Maths';
 
   const input = document.getElementById('game-input');
   if (mode === 'spelling') {
     input.className = 'game-input spelling-input';
     input.placeholder = 'Type the word...';
-    input.inputMode = 'text';
     document.getElementById('btn-hear').style.display = 'flex';
   } else {
     input.className = 'game-input';
     input.placeholder = 'Type your answer...';
-    input.inputMode = 'decimal';
     document.getElementById('btn-hear').style.display = 'none';
   }
-
-  updateUI();
+  updateRing();
   nextQuestion();
 }
 
-function updateUI() {
-  const p = currentProfile;
-  document.getElementById('level-badge').innerHTML = LEVEL_EMOJI[p.level] + ' ' + LEVEL_NAMES[p.level] + ' \u00b7 Level ' + p.level;
-  document.getElementById('stat-score').textContent = p.score;
-  document.getElementById('stat-best').textContent = p.bestStreak;
-
-  let streakText = String(p.streak);
-  if (p.streak >= 3) streakText += ' \uD83D\uDD25';
-  if (p.streak >= 6) streakText += '\uD83D\uDD25';
-  if (p.streak >= 10) streakText += '\uD83D\uDD25';
-  document.getElementById('stat-streak').innerHTML = streakText;
+function updateRing() {
+  if (!profile) return;
+  const goal = GOALS[profile.name] || 30;
+  const pts = profile.daily.pts;
+  const frac = Math.min(1, pts / goal);
+  const C = 119.4;
+  document.getElementById('ring-fill').style.strokeDashoffset = String(C * (1 - frac));
+  document.getElementById('ring-label').textContent = pts + '/' + goal;
+  document.getElementById('ringwrap').classList.toggle('done', pts >= goal);
+  document.getElementById('daystreak-chip').textContent = '🔥 ' + (profile.daily.streak || 0);
 }
 
-// ===== NEXT QUESTION (Elsie/Freya) =====
+function setTopicChip(t, st) {
+  const el = document.getElementById('topic-chip');
+  if (currentMode === 'spelling') {
+    el.innerHTML = '📝 Spelling · Band ' + profile.spelling.band;
+    return;
+  }
+  let note = '';
+  if (!st || st.reps === 0) note = ' · <span class="tc-note">New ✨</span>';
+  else if (st.due <= Date.now()) note = ' · <span class="tc-note">Review 🔁</span>';
+  el.innerHTML = t.emoji + ' ' + t.name + note;
+}
+
 function nextQuestion() {
   waiting = false;
+  qCount++;
   const input = document.getElementById('game-input');
   input.value = '';
   input.className = currentMode === 'spelling' ? 'game-input spelling-input' : 'game-input';
   document.getElementById('feedback').textContent = '';
   document.getElementById('feedback').className = 'feedback';
   document.getElementById('correct-answer').textContent = '';
-  document.getElementById('btn-check').textContent = 'Check \u2713';
+  document.getElementById('btn-check').textContent = 'Check ✓';
   document.getElementById('btn-check').onclick = checkAnswer;
   input.disabled = false;
-  input.focus();
 
   if (currentMode === 'spelling') {
     document.getElementById('question-text').style.display = 'none';
     document.getElementById('question-visual').style.display = 'none';
     document.getElementById('question-visual').innerHTML = '';
     document.getElementById('hint-text').style.display = 'block';
-
-    // Missed word recycling: 40% chance to pull from missed words
-    let picked = null;
-    if (missedWords.length > 0 && Math.random() < 0.4) {
-      const idx = Math.floor(Math.random() * missedWords.length);
-      const missedWord = missedWords[idx];
-      const levelWords = WORDS[currentProfile.level];
-      const match = levelWords.find(w => w.word === missedWord);
-      if (match) picked = match;
-    }
-
-    if (!picked) {
-      const levelWords = WORDS[currentProfile.level];
-      const available = levelWords.filter(w => !usedWords.includes(w.word));
-      let pool = available.length > 0 ? available : levelWords;
-      if (available.length === 0) usedWords = [];
-      picked = pool[Math.floor(Math.random() * pool.length)];
-    }
-
+    const picked = selectWord(profile);
     currentQuestion = { word: picked.word, hint: picked.hint, answer: picked.word.toLowerCase() };
-    usedWords.push(picked.word);
-
+    lastWord = picked.word;
+    setTopicChip();
+    input.inputMode = 'text';
     document.getElementById('hint-text').innerHTML = picked.hint;
     setTimeout(() => hearWord(), 400);
   } else {
     document.getElementById('question-text').style.display = 'block';
     document.getElementById('hint-text').style.display = 'block';
-
-    const generators = MATHS[currentProfile.level];
-    const tags = MATHS_TAGS[currentProfile.level];
-    const sel = selectWeighted(generators, tags, currentProfile, currentProfile.level, lastMathTags, missedMathTypes);
-    currentQuestion = sel.gen();
-    currentQuestionTag = sel.tag;
-    lastMathTags.push(sel.tag);
-    if (lastMathTags.length > 2) lastMathTags.shift();
-
+    currentTopic = selectMathsTopic(profile);
+    setTopicChip(currentTopic, profile.topics[currentTopic.id]);
+    lastTopics.push(currentTopic.id);
+    if (lastTopics.length > 2) lastTopics.shift();
+    currentQuestion = pick(currentTopic.gens)();
+    input.inputMode = /^[0-9.]+$/.test(String(currentQuestion.answer)) ? 'decimal' : 'text';
     document.getElementById('question-text').textContent = currentQuestion.question;
     document.getElementById('hint-text').textContent = currentQuestion.hint;
-
-    // Render optional visual (e.g. block arrays for multiplication)
     const vizEl = document.getElementById('question-visual');
-    if (currentQuestion.visual) {
-      vizEl.style.display = 'flex';
-      vizEl.innerHTML = currentQuestion.visual;
-    } else {
-      vizEl.style.display = 'none';
-      vizEl.innerHTML = '';
-    }
+    if (currentQuestion.visual) { vizEl.style.display = 'flex'; vizEl.innerHTML = currentQuestion.visual; }
+    else { vizEl.style.display = 'none'; vizEl.innerHTML = ''; }
   }
+  qStart = Date.now();
+  input.focus();
 }
 
-// ===== TTS =====
 function getIrishVoice() {
   const voices = window.speechSynthesis.getVoices();
   return voices.find(v => v.lang === 'en-IE')
@@ -1366,14 +1388,13 @@ function hearWord() {
   speakText(currentQuestion.word, 0.85);
 }
 
-// ===== CHECK ANSWER (Elsie/Freya) =====
 function checkAnswer() {
   if (waiting) return;
-
   const input = document.getElementById('game-input');
   const raw = input.value.trim();
   if (!raw) return;
 
+  const ms = Math.min(Date.now() - qStart, 120000);
   let correct = false;
 
   if (currentMode === 'spelling') {
@@ -1381,264 +1402,330 @@ function checkAnswer() {
   } else {
     const userAns = raw.replace(/\s/g, '').toLowerCase();
     const expected = String(currentQuestion.answer).replace(/\s/g, '').toLowerCase();
-
     correct = userAns === expected;
-
     if (!correct && currentQuestion.acceptAlt) {
-      correct = currentQuestion.acceptAlt.some(alt => {
-        const normAlt = String(alt).replace(/\s/g, '').toLowerCase();
-        return userAns === normAlt;
-      });
+      correct = currentQuestion.acceptAlt.some(alt => userAns === String(alt).replace(/\s/g, '').toLowerCase());
     }
-
     if (!correct) {
-      const userNum = parseFloat(userAns);
-      const expNum = parseFloat(expected);
-      if (!isNaN(userNum) && !isNaN(expNum) && Math.abs(userNum - expNum) < 0.01) {
-        correct = true;
-      }
+      const userNum = parseFloat(userAns), expNum = parseFloat(expected);
+      if (!isNaN(userNum) && !isNaN(expNum) && Math.abs(userNum - expNum) < 0.01) correct = true;
     }
   }
 
-  const p = currentProfile;
-  const maxLevel = 5;
+  const p = profile;
+  const fb = document.getElementById('feedback');
 
   if (correct) {
     input.classList.add('correct');
-    document.getElementById('feedback').textContent = pick(CORRECT_MSGS);
-    document.getElementById('feedback').className = 'feedback correct-fb';
     p.score++;
     p.streak++;
     if (p.streak > p.bestStreak) p.bestStreak = p.streak;
-
-    // Spelling: remove from missed words if gotten right
-    if (currentMode === 'spelling' && currentQuestion.word) {
-      const idx = missedWords.indexOf(currentQuestion.word);
-      if (idx !== -1) missedWords.splice(idx, 1);
+    let pts = 2;
+    if (currentMode === 'maths') {
+      const fluent = gradeMathsAnswer(p, currentTopic, true, ms);
+      if (fluent && currentTopic.fam === 'facts') pts = 3;
+    } else {
+      gradeWordAnswer(p, currentQuestion.word, true);
     }
-
-    recordAnswer(p, true);
-    if (currentMode === 'maths' && currentQuestionTag) {
-      recordTypeResult(p, p.level, currentQuestionTag, true);
-      var idx = missedMathTypes.indexOf(currentQuestionTag);
-      if (idx !== -1) missedMathTypes.splice(idx, 1);
-    }
+    let msg = pick(CORRECT_MSGS);
+    if (p.streak >= 3) msg += ' ⚡' + p.streak + ' in a row!';
+    fb.innerHTML = msg + (pts === 3 ? '<span class="bonus">⚡ Lightning fast! Bonus point</span>' : '');
+    fb.className = 'feedback correct-fb';
     spawnConfetti();
-
-    const adaptive = checkAdaptive(p, maxLevel);
-    if (adaptive === 'up') {
-      p.level++;
-      p.recentAnswers = [];
-      saveProfile(p);
-      updateUI();
-      showLevelChange('up');
-      setTimeout(() => nextQuestion(), 2200);
-      waiting = true;
-      return;
-    }
+    addPoints(p, pts);
   } else {
     input.classList.add('wrong');
-    document.getElementById('feedback').textContent = pick(WRONG_MSGS);
-    document.getElementById('feedback').className = 'feedback wrong-fb';
-
+    fb.textContent = pick(WRONG_MSGS);
+    fb.className = 'feedback wrong-fb';
     if (currentMode === 'spelling') {
       document.getElementById('correct-answer').textContent = currentQuestion.word;
-      // Add to missed words for recycling
-      if (!missedWords.includes(currentQuestion.word)) {
-        missedWords.push(currentQuestion.word);
-      }
+      gradeWordAnswer(p, currentQuestion.word, false);
       setTimeout(() => speakText(currentQuestion.word, 0.7), 300);
     } else {
-      // Show full equation for maths (Numberblocks principle: representation IS the concept)
       const q = currentQuestion.question.replace(' = ?', '');
       document.getElementById('correct-answer').textContent = q + ' = ' + currentQuestion.answer;
+      gradeMathsAnswer(p, currentTopic, false, ms);
     }
-
     p.streak = 0;
-    recordAnswer(p, false);
-    if (currentMode === 'maths' && currentQuestionTag) {
-      recordTypeResult(p, p.level, currentQuestionTag, false);
-      missedMathTypes.push(currentQuestionTag);
-    }
-
-    const adaptive = checkAdaptive(p, maxLevel);
-    if (adaptive === 'down') {
-      p.level--;
-      p.recentAnswers = [];
-      saveProfile(p);
-      updateUI();
-      showLevelChange('down');
-      setTimeout(() => nextQuestion(), 2200);
-      waiting = true;
-      return;
-    }
   }
 
-  saveProfile(p);
-  updateUI();
-
+  saveChild(p);
+  updateRing();
   waiting = true;
-  document.getElementById('btn-check').textContent = 'Next \u2192';
+  document.getElementById('btn-check').textContent = 'Next →';
   document.getElementById('btn-check').onclick = () => nextQuestion();
   input.disabled = true;
 }
 
-// ===== TEDDY GAME =====
+// =====================================================================
+// TEDDY — keeps its v1 adaptive levels, gains the daily star goal
+// =====================================================================
+function getTeddyProfile() {
+  const stored = localStorage.getItem('mixed_teddy');
+  if (stored) {
+    const p = JSON.parse(stored);
+    if (!p.recentAnswers) p.recentAnswers = [];
+    if (!p.typeStats) p.typeStats = {};
+    return p;
+  }
+  return { name:'teddy', mode:'mixed', level:1, score:0, streak:0, bestStreak:0, recentAnswers:[], typeStats:{} };
+}
+function saveTeddyProfile(p) { localStorage.setItem('mixed_teddy', JSON.stringify(p)); }
+
+const WINDOW_SIZE = 8, LEVEL_UP_THRESHOLD = 6, LEVEL_DOWN_THRESHOLD = 2, MIN_ANSWERS_FOR_DOWN = 6;
+
+function checkAdaptive(p, maxLevel) {
+  const recent = p.recentAnswers || [];
+  if (recent.length < WINDOW_SIZE) return null;
+  const correct = recent.filter(Boolean).length;
+  if (correct >= LEVEL_UP_THRESHOLD && p.level < maxLevel) return 'up';
+  if (correct <= LEVEL_DOWN_THRESHOLD && recent.length >= MIN_ANSWERS_FOR_DOWN && p.level > 1) return 'down';
+  return null;
+}
+
+function recordAnswer(p, isCorrect) {
+  if (!p.recentAnswers) p.recentAnswers = [];
+  p.recentAnswers.push(isCorrect);
+  if (p.recentAnswers.length > WINDOW_SIZE) p.recentAnswers.shift();
+}
+
+function recordTypeResult(p, level, tag, isCorrect) {
+  if (!p.typeStats) p.typeStats = {};
+  const key = level + ':' + tag;
+  if (!p.typeStats[key]) p.typeStats[key] = { right: 0, wrong: 0 };
+  const s = p.typeStats[key];
+  if (isCorrect) s.right++; else s.wrong++;
+  if (s.right + s.wrong > 20) { s.right = Math.floor(s.right/2); s.wrong = Math.floor(s.wrong/2); }
+}
+
+function selectWeighted(generators, tags, p, level, lTags, missedTypes) {
+  const stats = p.typeStats || {};
+  const weights = generators.map(function(gen, i) {
+    const key = level + ':' + tags[i];
+    const s = stats[key];
+    if (!s || (s.right + s.wrong) < 3) return 1.5;
+    var rate = s.right / (s.right + s.wrong);
+    return Math.max(0.3, Math.min(3.0, 1 / (rate + 0.1)));
+  });
+  var missed = missedTypes || [];
+  weights.forEach(function(w, i) {
+    var count = missed.filter(function(t) { return t === tags[i]; }).length;
+    if (count > 0) weights[i] *= (1 + count * 0.5);
+  });
+  if (lTags && lTags.length > 0) {
+    var hasNonZero = false;
+    weights.forEach(function(w, i) {
+      if (lTags.includes(tags[i])) weights[i] = 0;
+      else if (w > 0) hasNonZero = true;
+    });
+    if (!hasNonZero) {
+      generators.forEach(function(g, i) {
+        var key = level + ':' + tags[i];
+        var s = stats[key];
+        weights[i] = (!s || (s.right+s.wrong)<3) ? 1.5 : Math.max(0.3, Math.min(3.0, 1/(s.right/(s.right+s.wrong)+0.1)));
+      });
+    }
+  }
+  var total = weights.reduce(function(a,b){return a+b;}, 0);
+  var r = Math.random() * total;
+  for (var i = 0; i < generators.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return { gen: generators[i], idx: i, tag: tags[i] };
+  }
+  return { gen: generators[generators.length-1], idx: generators.length-1, tag: tags[tags.length-1] };
+}
+
 function startTeddyGame() {
-  currentMode = 'mixed';
-  currentProfile = getProfile('mixed', 'teddy');
-  teddySessionScore = 0;
+  teddyProfile = getTeddyProfile();
+  profile = loadChild('teddy');
   showScreen('screen-teddy');
+  document.getElementById('teddy-daystreak').textContent = '🔥 ' + (profile.daily.streak || 0);
   updateTeddyStars();
   nextTeddyQuestion();
 }
 
 function updateTeddyStars() {
   const el = document.getElementById('teddy-stars');
-  const filled = Math.min(teddySessionScore, 10);
-  const empty = 10 - filled;
-  el.textContent = '\u2B50'.repeat(filled) + '\u2606'.repeat(empty);
-  if (teddySessionScore > 0 && teddySessionScore % 10 === 0) {
-    el.textContent = '\uD83C\uDF1F\uD83C\uDF89 Super Star! \uD83C\uDF89\uD83C\uDF1F';
-  }
+  const goal = GOALS.teddy;
+  const filled = Math.min(profile.daily.pts, goal);
+  el.textContent = '⭐'.repeat(filled) + '☆'.repeat(Math.max(0, goal - filled));
+  if (profile.daily.pts >= goal) el.textContent = '🌟🎉 Super Star! 🎉🌟';
 }
 
 function nextTeddyQuestion() {
   waiting = false;
   document.getElementById('teddy-feedback').textContent = '';
   document.getElementById('teddy-feedback').className = 'teddy-feedback';
-
-  const level = currentProfile.level || 1;
+  const level = teddyProfile.level || 1;
   const generators = TEDDY_Q[level] || TEDDY_Q[1];
   const tags = TEDDY_TAGS[level] || TEDDY_TAGS[1];
-  const sel = selectWeighted(generators, tags, currentProfile, level, lastTeddyTags, missedTeddyTypes);
+  const sel = selectWeighted(generators, tags, teddyProfile, level, lastTeddyTags, missedTeddyTypes);
   currentQuestion = sel.gen();
-  currentQuestionTag = sel.tag;
+  currentQuestion._tag = sel.tag;
   lastTeddyTags.push(sel.tag);
   if (lastTeddyTags.length > 2) lastTeddyTags.shift();
 
   document.getElementById('teddy-prompt').textContent = currentQuestion.prompt;
-
   const visualEl = document.getElementById('teddy-visual');
-  if (currentQuestion.visualIsHTML) {
-    visualEl.innerHTML = currentQuestion.visual || '';
-  } else {
-    visualEl.textContent = currentQuestion.visual || '';
-  }
+  if (currentQuestion.visualIsHTML) visualEl.innerHTML = currentQuestion.visual || '';
+  else visualEl.textContent = currentQuestion.visual || '';
 
-  // Render choices
   const choicesEl = document.getElementById('teddy-choices');
   choicesEl.innerHTML = '';
-  currentQuestion.choices.forEach((choice, i) => {
+  currentQuestion.choices.forEach((choice) => {
     const btn = document.createElement('button');
     btn.className = 'teddy-choice';
-    if (currentQuestion.choiceLabels) {
-      btn.innerHTML = currentQuestion.choiceLabels[i];
-    } else {
-      btn.textContent = choice;
-    }
+    btn.textContent = choice;
     btn.onclick = () => checkTeddyAnswer(choice, btn);
     choicesEl.appendChild(btn);
   });
-
-  // Speak prompt
   setTimeout(() => speakText(currentQuestion.speak, 0.85), 400);
 }
 
 function checkTeddyAnswer(chosen, btnEl) {
   if (waiting) return;
   waiting = true;
-
   const correct = chosen === currentQuestion.answer;
-  const p = currentProfile;
+  const p = teddyProfile;
   const feedbackEl = document.getElementById('teddy-feedback');
   const allBtns = document.querySelectorAll('#teddy-choices .teddy-choice');
-
-  // Disable all buttons
   allBtns.forEach(b => b.classList.add('disabled'));
 
   if (correct) {
     btnEl.classList.add('correct-choice');
     feedbackEl.textContent = pick(TEDDY_CORRECT);
     feedbackEl.className = 'teddy-feedback correct-fb';
-    p.score++;
-    p.streak++;
+    p.score++; p.streak++;
     if (p.streak > p.bestStreak) p.bestStreak = p.streak;
-    teddySessionScore++;
-    updateTeddyStars();
     recordAnswer(p, true);
-    if (currentQuestionTag) {
-      recordTypeResult(p, p.level, currentQuestionTag, true);
-      var idx = missedTeddyTypes.indexOf(currentQuestionTag);
-      if (idx !== -1) missedTeddyTypes.splice(idx, 1);
-    }
+    recordTypeResult(p, p.level, currentQuestion._tag, true);
+    var mi = missedTeddyTypes.indexOf(currentQuestion._tag);
+    if (mi !== -1) missedTeddyTypes.splice(mi, 1);
     spawnConfetti();
-
+    addPoints(profile, 1);
+    saveChild(profile);
+    updateTeddyStars();
+    document.getElementById('teddy-daystreak').textContent = '🔥 ' + (profile.daily.streak || 0);
     setTimeout(() => speakText(pick(TEDDY_CORRECT), 0.9), 200);
-
-    const adaptive = checkAdaptive(p, 3); // Teddy has 3 levels
-    if (adaptive === 'up') {
-      p.level++;
-      p.recentAnswers = [];
-      saveProfile(p);
-      setTimeout(() => nextTeddyQuestion(), 2000);
-      return;
-    }
-
-    saveProfile(p);
+    const adaptive = checkAdaptive(p, 3);
+    if (adaptive === 'up') { p.level++; p.recentAnswers = []; saveTeddyProfile(p); setTimeout(() => nextTeddyQuestion(), 2000); return; }
+    saveTeddyProfile(p);
     setTimeout(() => nextTeddyQuestion(), 1500);
   } else {
     btnEl.classList.add('wrong-choice');
     const spokenAnswer = currentQuestion.speakAnswer || currentQuestion.answer;
     feedbackEl.textContent = "Nearly! It's " + spokenAnswer;
     feedbackEl.className = 'teddy-feedback wrong-fb';
-
-    // Highlight correct answer
-    allBtns.forEach(b => {
-      const val = currentQuestion.choiceLabels ? null : b.textContent;
-      if (val === currentQuestion.answer) {
-        b.classList.add('correct-choice');
-      }
-    });
-
+    allBtns.forEach(b => { if (b.textContent === currentQuestion.answer) b.classList.add('correct-choice'); });
     p.streak = 0;
     recordAnswer(p, false);
-    if (currentQuestionTag) {
-      recordTypeResult(p, p.level, currentQuestionTag, false);
-      missedTeddyTypes.push(currentQuestionTag);
-    }
-
+    recordTypeResult(p, p.level, currentQuestion._tag, false);
+    missedTeddyTypes.push(currentQuestion._tag);
     setTimeout(() => speakText("Nearly! It's " + spokenAnswer, 0.85), 200);
-
     const adaptive = checkAdaptive(p, 3);
-    if (adaptive === 'down') {
-      p.level--;
-      p.recentAnswers = [];
-      saveProfile(p);
-      setTimeout(() => nextTeddyQuestion(), 2500);
-      return;
-    }
-
-    saveProfile(p);
+    if (adaptive === 'down') { p.level--; p.recentAnswers = []; saveTeddyProfile(p); setTimeout(() => nextTeddyQuestion(), 2500); return; }
+    saveTeddyProfile(p);
     setTimeout(() => nextTeddyQuestion(), 2500);
   }
 }
 
-// ===== EFFECTS =====
-function showLevelChange(direction) {
-  const div = document.createElement('div');
-  div.className = 'level-change ' + direction;
-  if (direction === 'up') {
-    div.innerHTML = '<div class="emoji">\uD83D\uDE80</div><div class="msg">Level Up! ' + LEVEL_NAMES[currentProfile.level] + '!</div>';
-  } else {
-    div.innerHTML = '<div class="emoji">\uD83D\uDCAA</div><div class="msg">Let\'s practise at ' + LEVEL_NAMES[currentProfile.level] + '</div>';
+// =====================================================================
+// PARENT VIEW
+// =====================================================================
+const STATUS_LABEL = { mastered:'Mastered', solid:'Solid', learning:'Learning', shaky:'Shaky', new:'Not started', locked:'🔒 Locked' };
+
+function activityDots(p) {
+  let html = '<div class="dots"><span class="lbl">Last 14 days</span>';
+  const goal = GOALS[p.name] || 30;
+  for (let i = 13; i >= 0; i--) {
+    const d = todayStr(-i * DAY);
+    const pts = p.daily.hist[d] || 0;
+    const cls = pts >= goal ? 'hit' : (pts > 0 ? 'part' : '');
+    html += '<span class="dot ' + cls + '" title="' + d + ': ' + pts + '"></span>';
   }
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 2100);
+  return html + '</div>';
+}
+
+function renderKid(name) {
+  const p = loadChild(name);
+  const display = name.charAt(0).toUpperCase() + name.slice(1);
+  const goal = GOALS[name] || 30;
+  let html = '<div class="kid-card"><h3>' + AVATARS[name] + ' ' + display + ' <span class="chip">' + CLASS_INFO[name] + '</span></h3>';
+  html += '<div class="chips">';
+  html += '<span class="chip">🔥 ' + (p.daily.streak||0) + '-day streak</span>';
+  html += '<span class="chip">⭐ ' + p.daily.pts + '/' + goal + ' today</span>';
+  html += '<span class="chip">🎖️ ' + (p.score||0) + ' lifetime</span>';
+  if (name !== 'teddy') {
+    const mastered = TOPICS.filter(t => (p.topics[t.id]||{s:0}).s >= 5).length;
+    html += '<span class="chip">🏆 ' + mastered + '/' + TOPICS.length + ' topics</span>';
+    const wordsSolid = Object.keys(p.spelling.words).filter(w => p.spelling.words[w].s >= 3).length;
+    html += '<span class="chip">📚 Band ' + p.spelling.band + ' · ' + wordsSolid + ' words solid</span>';
+  }
+  html += '</div>';
+  html += activityDots(p);
+
+  if (name === 'teddy') {
+    const tp = getTeddyProfile();
+    html += '<div class="bandhd">Teddy’s game</div><div class="prow"><span class="pname">🧸 Level ' + (tp.level||1) + ' of 3</span><span class="pill st-solid">' + (tp.score||0) + ' stars ever</span><span class="ppct"></span></div>';
+    html += '</div>';
+    return html;
+  }
+
+  for (let band = 1; band <= 5; band++) {
+    const rows = TOPICS.filter(t => t.band === band);
+    html += '<div class="bandhd">Maths · Band ' + band + '</div>';
+    rows.forEach(t => {
+      const st = p.topics[t.id];
+      const status = topicStatus(p, t);
+      const n = st ? st.r + st.w : 0;
+      const pct = n ? Math.round(st.r / n * 100) + '%' : '–';
+      const slow = t.fam === 'facts' && st && st.ema && st.ema > FLUENT.facts && st.reps >= 3 ? ' 🐢' : '';
+      html += '<div class="prow"><span class="pname">' + t.emoji + ' ' + t.name + slow + '</span>' +
+        '<span class="pill st-' + status + '">' + STATUS_LABEL[status] + '</span>' +
+        '<span class="ppct">' + pct + '</span></div>';
+    });
+  }
+
+  const trouble = Object.keys(p.spelling.words).filter(w => { const ws = p.spelling.words[w]; return ws.w > 0 && ws.s < 2; });
+  if (trouble.length) html += '<div class="trouble">📝 Tricky words right now: <b>' + trouble.slice(0, 10).join(', ') + '</b></div>';
+  html += '</div>';
+  return html;
+}
+
+function showParent() {
+  document.getElementById('parent-content').innerHTML = renderKid('elsie') + renderKid('freya') + renderKid('teddy');
+  showScreen('screen-parent');
+}
+
+// =====================================================================
+// EFFECTS
+// =====================================================================
+function showDone(p) {
+  document.getElementById('done-msg').textContent = 'Daily goal smashed! 🎉';
+  document.getElementById('done-sub').textContent = '🔥 ' + p.daily.streak + ' day' + (p.daily.streak === 1 ? '' : 's') + ' in a row — brilliant!';
+  document.getElementById('done-overlay').classList.add('show');
+  spawnConfetti(); spawnConfetti();
+}
+
+function hideDone(finish) {
+  document.getElementById('done-overlay').classList.remove('show');
+  if (finish) goHome();
+  else if (document.getElementById('screen-game').classList.contains('active')) {
+    document.getElementById('game-input').focus();
+  }
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
 function spawnConfetti() {
-  const colors = ['#ff6b9d', '#c084fc', '#60a5fa', '#34d399', '#fbbf24', '#fb923c'];
+  const colors = ['#4285f4', '#34a853', '#f9ab00', '#ea4335', '#9334e6', '#1a73e8'];
   for (let i = 0; i < 20; i++) {
     const piece = document.createElement('div');
     piece.className = 'confetti-piece';
@@ -1654,20 +1741,16 @@ function spawnConfetti() {
   }
 }
 
-// ===== KEYBOARD =====
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     if (document.getElementById('screen-game').classList.contains('active')) {
-      if (waiting) {
-        nextQuestion();
-      } else {
-        checkAnswer();
-      }
+      if (document.getElementById('done-overlay').classList.contains('show')) return;
+      if (waiting) nextQuestion();
+      else checkAnswer();
     }
   }
 });
 
-// ===== KEYBOARD DETECTION (mobile) =====
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', () => {
     const isKeyboard = window.visualViewport.height < window.innerHeight * 0.75;
@@ -1675,7 +1758,6 @@ if (window.visualViewport) {
   });
 }
 
-// Load voices
 window.speechSynthesis.onvoiceschanged = () => {};
 window.speechSynthesis.getVoices();
 
