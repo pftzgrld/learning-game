@@ -47,10 +47,8 @@
   .screen.active { display: block; }
 
   h1.brand { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 4px; }
-  h1.brand .cap { color: var(--g-blue); }
-  h1.brand .l1 { color: var(--g-red); }
-  h1.brand .l2 { color: var(--g-yellow); }
-  h1.brand .l3 { color: var(--g-green); }
+  .cB { color: var(--g-blue); } .cR { color: var(--g-red); }
+  .cY { color: var(--g-yellow); } .cG { color: var(--g-green); }
   .tagline { color: var(--muted); font-size: 14.5px; margin-bottom: 28px; }
 
   .profiles, .modes { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
@@ -332,7 +330,7 @@
 
 <!-- ===== SCREEN: PROFILE SELECT ===== -->
 <div class="screen active" id="screen-select">
-  <h1 class="brand">🎓 <span class="cap">L</span>earning <span class="l1">C</span><span class="l2">l</span><span class="l3">u</span>b</h1>
+  <h1 class="brand">🎓 <span class="cB">L</span><span class="cR">e</span><span class="cY">a</span><span class="cB">r</span><span class="cG">n</span><span class="cR">i</span><span class="cB">n</span><span class="cR">g</span> <span class="cY">C</span><span class="cB">l</span><span class="cG">u</span><span class="cR">b</span></h1>
   <p class="tagline">A little every day goes a long way ✨</p>
   <div class="profiles">
     <button class="profile-btn" onclick="selectPlayer('elsie')">
