@@ -1506,8 +1506,33 @@ function getBestVoice() {
   return pool.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0];
 }
 
+// Pre-generated Azure neural audio (Emily, Irish) — audio/manifest.json maps
+// normalised phrase -> mp3, built by tools/generate_audio.py. Phrases without
+// a file (and devices before the audio ships) fall back to the device voice.
+let AUDIO_MANIFEST = null;
+let audioEl = null;
+fetch('audio/manifest.json').then(r => r.ok ? r.json() : null).then(m => { AUDIO_MANIFEST = m; }).catch(() => {});
+
+function normSpeech(t) {
+  return String(t).toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function speakText(text, rate) {
   window.speechSynthesis.cancel();
+  if (audioEl) { audioEl.pause(); audioEl = null; }
+  if (AUDIO_MANIFEST) {
+    const key = normSpeech(text);
+    const f = (rate && rate <= 0.75 ? AUDIO_MANIFEST[key + '##slow'] : null) || AUDIO_MANIFEST[key];
+    if (f) {
+      audioEl = new Audio('audio/' + f);
+      audioEl.play().catch(() => deviceSpeak(text, rate));
+      return;
+    }
+  }
+  deviceSpeak(text, rate);
+}
+
+function deviceSpeak(text, rate) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.rate = rate || 0.9;
   const voice = getBestVoice();
